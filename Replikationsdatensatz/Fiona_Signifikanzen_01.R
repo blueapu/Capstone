@@ -1,0 +1,512 @@
+
+# RCode Berechnung Signifikanzen Geschlechterunterschied 
+#--------------------------------------------------------
+
+# f?r alle Parteien (CVP=Kontrollvariable)
+lm_agric <- lm(agric_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_econo <- lm(econo_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_educ <- lm(educ_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_cult <- lm(cult_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_enven <- lm(enven_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_europ <- lm(europ_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_fntax <- lm(fntax_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_gndis <- lm(gndis_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_iasyl <- lm(iasyl_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_intrel <- lm(intrel_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_milit <- lm(milit_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_arbmk <- lm(arbmk_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_reord <- lm(reord_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_phlth <- lm(phlth_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_medkom <- lm(medkom_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_vrkhr <- lm(vrkhr_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_natzu <- lm(natzu_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_swelf <- lm(swelf_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+
+table <- stargazer(lm_gndis,lm_swelf,lm_phlth,lm_educ,
+                   lm_enven, lm_vrkhr, lm_agric, 
+                   lm_econo,lm_fntax, lm_arbmk,
+                   lm_iasyl, lm_europ, lm_intrel,
+                   lm_milit, lm_reord, 
+                   lm_cult, lm_medkom, lm_natzu, 
+                   type = "latex", out = "C:/Users/Fiona/Desktop/Master/Online-Wahrnehmung von Politikerinnen/Daten/lm_cvp_rk.html",
+                   title = c("Geschlechtereffekt ?ber alle Parteien"),
+                   dep.var.labels = c("Gleichstellung","Sozialstaat","Gesundheit", "Bildung",
+                                      "Umwelt","Verkehr", "Landwirtschaft", 
+                                      "Wirtschaft", "Finanzen","Arbeitsmarkt", 
+                                      "Migration", "Europa",  "Internationales",
+                                      "Milit?r","Recht/Ordnung",
+                                      "Kultur", "Medien",  "Nationaler Zusammenhalt"
+                   ),
+                   covariate.labels = c())
+
+# f?r alle Parteien (SVP=Referenzkategorie)
+df$party_short <- relevel(x = df$party_short, ref = "SVP")
+
+lm_agric <- lm(agric_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_econo <- lm(econo_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_educ <- lm(educ_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_cult <- lm(cult_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_enven <- lm(enven_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_europ <- lm(europ_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_fntax <- lm(fntax_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_gndis <- lm(gndis_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_iasyl <- lm(iasyl_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_intrel <- lm(intrel_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_milit <- lm(milit_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_arbmk <- lm(arbmk_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_reord <- lm(reord_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_phlth <- lm(phlth_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_medkom <- lm(medkom_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_vrkhr <- lm(vrkhr_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_natzu <- lm(natzu_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_swelf <- lm(swelf_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+
+table <- stargazer(lm_gndis,lm_swelf,lm_phlth,lm_educ,
+                   lm_enven, lm_vrkhr, lm_agric, 
+                   lm_econo,lm_fntax, lm_arbmk,
+                   lm_iasyl, lm_europ, lm_intrel,
+                   lm_milit, lm_reord, 
+                   lm_cult, lm_medkom, lm_natzu, 
+                   type = "latex", out = "C:/Users/Fiona/Desktop/Master/Online-Wahrnehmung von Politikerinnen/Daten/lm_svp_rk.html",
+                   title = c("Geschlechtereffekt ?ber alle Parteien"),
+                   dep.var.labels = c("Gleichstellung","Sozialstaat","Gesundheit", "Bildung",
+                                      "Umwelt","Verkehr", "Landwirtschaft", 
+                                      "Wirtschaft", "Finanzen","Arbeitsmarkt", 
+                                      "Migration", "Europa",  "Internationales",
+                                      "Milit?r","Recht/Ordnung",
+                                      "Kultur", "Medien",  "Nationaler Zusammenhalt"
+                   ),
+                   covariate.labels = c())
+
+# f?r alle Parteien (FDP=Referenzkategorie)
+df$party_short <- relevel(x = df$party_short, ref = "FDP")
+
+lm_agric <- lm(agric_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_econo <- lm(econo_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_educ <- lm(educ_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_cult <- lm(cult_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_enven <- lm(enven_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_europ <- lm(europ_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_fntax <- lm(fntax_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_gndis <- lm(gndis_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_iasyl <- lm(iasyl_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_intrel <- lm(intrel_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_milit <- lm(milit_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_arbmk <- lm(arbmk_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_reord <- lm(reord_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_phlth <- lm(phlth_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_medkom <- lm(medkom_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_vrkhr <- lm(vrkhr_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_natzu <- lm(natzu_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_swelf <- lm(swelf_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+
+table <- stargazer(lm_gndis,lm_swelf,lm_phlth,lm_educ,
+                   lm_enven, lm_vrkhr, lm_agric, 
+                   lm_econo,lm_fntax, lm_arbmk,
+                   lm_iasyl, lm_europ, lm_intrel,
+                   lm_milit, lm_reord, 
+                   lm_cult, lm_medkom, lm_natzu, 
+                   type = "latex", out = "C:/Users/Fiona/Desktop/Master/Online-Wahrnehmung von Politikerinnen/Daten/lm_fdp_rk.html",
+                   title = c("Geschlechtereffekt ?ber alle Parteien"),
+                   dep.var.labels = c("Gleichstellung","Sozialstaat","Gesundheit", "Bildung",
+                                      "Umwelt","Verkehr", "Landwirtschaft", 
+                                      "Wirtschaft", "Finanzen","Arbeitsmarkt", 
+                                      "Migration", "Europa",  "Internationales",
+                                      "Milit?r","Recht/Ordnung",
+                                      "Kultur", "Medien",  "Nationaler Zusammenhalt"
+                   ),
+                   covariate.labels = c())
+
+# f?r alle Parteien (GLP=Referenzkategorie)
+df$party_short <- relevel(x = df$party_short, ref = "GLP")
+
+lm_agric <- lm(agric_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_econo <- lm(econo_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_educ <- lm(educ_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_cult <- lm(cult_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_enven <- lm(enven_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_europ <- lm(europ_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_fntax <- lm(fntax_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_gndis <- lm(gndis_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_iasyl <- lm(iasyl_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_intrel <- lm(intrel_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_milit <- lm(milit_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_arbmk <- lm(arbmk_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_reord <- lm(reord_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_phlth <- lm(phlth_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_medkom <- lm(medkom_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_vrkhr <- lm(vrkhr_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_natzu <- lm(natzu_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_swelf <- lm(swelf_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+
+table <- stargazer(lm_gndis,lm_swelf,lm_phlth,lm_educ,
+                   lm_enven, lm_vrkhr, lm_agric, 
+                   lm_econo,lm_fntax, lm_arbmk,
+                   lm_iasyl, lm_europ, lm_intrel,
+                   lm_milit, lm_reord, 
+                   lm_cult, lm_medkom, lm_natzu, 
+                   type = "latex", out = "C:/Users/Fiona/Desktop/Master/Online-Wahrnehmung von Politikerinnen/Daten/lm_glp_rk.html",
+                   title = c("Geschlechtereffekt ?ber alle Parteien"),
+                   dep.var.labels = c("Gleichstellung","Sozialstaat","Gesundheit", "Bildung",
+                                      "Umwelt","Verkehr", "Landwirtschaft", 
+                                      "Wirtschaft", "Finanzen","Arbeitsmarkt", 
+                                      "Migration", "Europa",  "Internationales",
+                                      "Milit?r","Recht/Ordnung",
+                                      "Kultur", "Medien",  "Nationaler Zusammenhalt"
+                   ),
+                   covariate.labels = c())
+
+# f?r alle Parteien (Gr?ne=Referenzkategorie)
+df$party_short <- relevel(x = df$party_short, ref = "GPS")
+
+lm_agric <- lm(agric_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_econo <- lm(econo_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_educ <- lm(educ_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_cult <- lm(cult_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_enven <- lm(enven_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_europ <- lm(europ_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_fntax <- lm(fntax_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_gndis <- lm(gndis_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_iasyl <- lm(iasyl_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_intrel <- lm(intrel_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_milit <- lm(milit_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_arbmk <- lm(arbmk_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_reord <- lm(reord_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_phlth <- lm(phlth_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_medkom <- lm(medkom_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_vrkhr <- lm(vrkhr_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_natzu <- lm(natzu_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_swelf <- lm(swelf_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+
+table <- stargazer(lm_gndis,lm_swelf,lm_phlth,lm_educ,
+                   lm_enven, lm_vrkhr, lm_agric, 
+                   lm_econo,lm_fntax, lm_arbmk,
+                   lm_iasyl, lm_europ, lm_intrel,
+                   lm_milit, lm_reord, 
+                   lm_cult, lm_medkom, lm_natzu, 
+                   type = "latex", out = "C:/Users/Fiona/Desktop/Master/Online-Wahrnehmung von Politikerinnen/Daten/lm_gps_rk.html",
+                   title = c("Geschlechtereffekt ?ber alle Parteien"),
+                   dep.var.labels = c("Gleichstellung","Sozialstaat","Gesundheit", "Bildung",
+                                      "Umwelt","Verkehr", "Landwirtschaft", 
+                                      "Wirtschaft", "Finanzen","Arbeitsmarkt", 
+                                      "Migration", "Europa",  "Internationales",
+                                      "Milit?r","Recht/Ordnung",
+                                      "Kultur", "Medien",  "Nationaler Zusammenhalt"
+                   ),
+                   covariate.labels = c())
+
+# f?r alle Parteien (SP=Referenzkategorie)
+df$party_short <- relevel(x = df$party_short, ref = "SP")
+
+lm_agric <- lm(agric_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_econo <- lm(econo_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_educ <- lm(educ_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_cult <- lm(cult_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_enven <- lm(enven_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_europ <- lm(europ_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_fntax <- lm(fntax_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_gndis <- lm(gndis_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_iasyl <- lm(iasyl_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_intrel <- lm(intrel_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_milit <- lm(milit_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_arbmk <- lm(arbmk_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_reord <- lm(reord_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_phlth <- lm(phlth_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_medkom <- lm(medkom_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_vrkhr <- lm(vrkhr_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_natzu <- lm(natzu_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_swelf <- lm(swelf_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+
+table <- stargazer(lm_gndis,lm_swelf,lm_phlth,lm_educ,
+                   lm_enven, lm_vrkhr, lm_agric, 
+                   lm_econo,lm_fntax, lm_arbmk,
+                   lm_iasyl, lm_europ, lm_intrel,
+                   lm_milit, lm_reord, 
+                   lm_cult, lm_medkom, lm_natzu, 
+                   type = "latex", out = "C:/Users/Fiona/Desktop/Master/Online-Wahrnehmung von Politikerinnen/Daten/lm_sp_rk.html",
+                   title = c("Geschlechtereffekt ?ber alle Parteien"),
+                   dep.var.labels = c("Gleichstellung","Sozialstaat","Gesundheit", "Bildung",
+                                      "Umwelt","Verkehr", "Landwirtschaft", 
+                                      "Wirtschaft", "Finanzen","Arbeitsmarkt", 
+                                      "Migration", "Europa",  "Internationales",
+                                      "Milit?r","Recht/Ordnung",
+                                      "Kultur", "Medien",  "Nationaler Zusammenhalt"
+                   ),
+                   covariate.labels = c())
+
+# Geschlechterunterschied in der CVP
+lm_agric_cvp <- lm(agric_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "CVP",])
+lm_econo_cvp <- lm(econo_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "CVP",])
+lm_educ_cvp <- lm(educ_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "CVP",])
+lm_cult_cvp <- lm(cult_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "CVP",])
+lm_enven_cvp <- lm(enven_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "CVP",])
+lm_europ_cvp <- lm(europ_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "CVP",])
+lm_fntax_cvp <- lm(fntax_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "CVP",])
+lm_gndis_cvp <- lm(gndis_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "CVP",])
+lm_iasyl_cvp <- lm(iasyl_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "CVP",])
+lm_intrel_cvp <- lm(intrel_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "CVP",])
+lm_milit_cvp <- lm(milit_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "CVP",])
+lm_arbmk_cvp <- lm(arbmk_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "CVP",])
+lm_reord_cvp <- lm(reord_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "CVP",])
+lm_phlth_cvp <- lm(phlth_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "CVP",])
+lm_medkom_cvp <- lm(medkom_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "CVP",])
+lm_vrkhr_cvp <- lm(vrkhr_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "CVP",])
+lm_natzu_cvp <- lm(natzu_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "CVP",])
+lm_swelf_cvp <- lm(swelf_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "CVP",])
+
+
+table_CVP <- stargazer(lm_gndis_cvp,lm_swelf_cvp,lm_phlth_cvp,lm_educ_cvp,
+                       lm_enven_cvp, lm_vrkhr_cvp, lm_agric_cvp, 
+                       lm_econo_cvp,lm_fntax_cvp, lm_arbmk_cvp,
+                       lm_iasyl_cvp, lm_europ_cvp, lm_intrel_cvp,
+                       lm_milit_cvp, lm_reord_cvp, 
+                       lm_cult_cvp, lm_medkom_cvp, lm_natzu_cvp, 
+                     type = "latex", out = "C:/Users/Fiona/Desktop/Master/Online-Wahrnehmung von Politikerinnen/Daten/lm_CVP.html",
+                     title = c("Geschlechtereffekt bei der CVP"),
+                     dep.var.labels = c("Gleichstellung","Sozialstaat","Gesundheit", "Bildung",
+                                        "Umwelt","Verkehr", "Landwirtschaft", 
+                                        "Wirtschaft", "Finanzen","Arbeitsmarkt", 
+                                        "Migration", "Europa",  "Internationales",
+                                        "Milit?r","Recht/Ordnung",
+                                        "Kultur", "Medien",  "Nationaler Zusammenhalt"
+                                        ),
+                     covariate.labels = c())
+
+# Geschlechterunterschied in der SP
+lm_agric_sp <- lm(agric_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SP",])
+lm_econo_sp <- lm(econo_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SP",])
+lm_educ_sp <- lm(educ_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SP",])
+lm_cult_sp <- lm(cult_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SP",])
+lm_enven_sp <- lm(enven_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SP",])
+lm_europ_sp <- lm(europ_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SP",])
+lm_fntax_sp <- lm(fntax_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SP",])
+lm_gndis_sp <- lm(gndis_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SP",])
+lm_iasyl_sp <- lm(iasyl_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SP",])
+lm_intrel_sp <- lm(intrel_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SP",])
+lm_milit_sp <- lm(milit_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SP",])
+lm_arbmk_sp <- lm(arbmk_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SP",])
+lm_reord_sp <- lm(reord_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SP",])
+lm_phlth_sp <- lm(phlth_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SP",])
+lm_medkom_sp <- lm(medkom_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SP",])
+lm_vrkhr_sp <- lm(vrkhr_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SP",])
+lm_natzu_sp <- lm(natzu_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SP",])
+lm_swelf_sp <- lm(swelf_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SP",])
+
+table_SP <- stargazer(lm_gndis_sp,lm_swelf_sp,lm_phlth_sp,lm_educ_sp,
+                      lm_enven_sp, lm_vrkhr_sp, lm_agric_sp, 
+                      lm_econo_sp,lm_fntax_sp, lm_arbmk_sp,
+                      lm_iasyl_sp, lm_europ_sp, lm_intrel_sp,
+                      lm_milit_sp, lm_reord_sp, 
+                      lm_cult_sp, lm_medkom_sp, lm_natzu_sp, 
+                      type = "latex", out = "C:/Users/Fiona/Desktop/Master/Online-Wahrnehmung von Politikerinnen/Daten/lm_SP.html",
+                      title = c("Geschlechtereffekt bei der SP"),
+                      dep.var.labels = c("Gleichstellung","Sozialstaat","Gesundheit", "Bildung",
+                                         "Umwelt","Verkehr", "Landwirtschaft", 
+                                         "Wirtschaft", "Finanzen","Arbeitsmarkt", 
+                                         "Migration", "Europa",  "Internationales",
+                                         "Milit?r","Recht/Ordnung",
+                                         "Kultur", "Medien",  "Nationaler Zusammenhalt"
+                      ),
+                      covariate.labels = c())
+
+# Geschlechterunterschied in der FDP
+lm_agric_fdp <- lm(agric_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "FDP",])
+lm_econo_fdp <- lm(econo_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "FDP",])
+lm_educ_fdp <- lm(educ_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "FDP",])
+lm_cult_fdp <- lm(cult_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "FDP",])
+lm_enven_fdp <- lm(enven_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "FDP",])
+lm_europ_fdp <- lm(europ_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "FDP",])
+lm_fntax_fdp <- lm(fntax_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "FDP",])
+lm_gndis_fdp <- lm(gndis_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "FDP",])
+lm_iasyl_fdp <- lm(iasyl_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "FDP",])
+lm_intrel_fdp <- lm(intrel_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "FDP",])
+lm_milit_fdp <- lm(milit_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "FDP",])
+lm_arbmk_fdp <- lm(arbmk_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "FDP",])
+lm_reord_fdp <- lm(reord_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "FDP",])
+lm_phlth_fdp <- lm(phlth_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "FDP",])
+lm_medkom_fdp <- lm(medkom_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "FDP",])
+lm_vrkhr_fdp <- lm(vrkhr_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "FDP",])
+lm_natzu_fdp <- lm(natzu_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "FDP",])
+lm_swelf_fdp <- lm(swelf_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "FDP",])
+
+table_FDP <- stargazer(lm_gndis_fdp,lm_swelf_fdp,lm_phlth_fdp,lm_educ_fdp,
+                       lm_enven_fdp, lm_vrkhr_fdp, lm_agric_fdp, 
+                       lm_econo_fdp,lm_fntax_fdp, lm_arbmk_fdp,
+                       lm_iasyl_fdp, lm_europ_fdp, lm_intrel_fdp,
+                       lm_milit_fdp, lm_reord_fdp, 
+                       lm_cult_fdp, lm_medkom_fdp, lm_natzu_fdp, 
+                       type = "latex", out = "C:/Users/Fiona/Desktop/Master/Online-Wahrnehmung von Politikerinnen/Daten/lm_FDP.html",
+                       title = c("Geschlechtereffekt bei der FDP"),
+                       dep.var.labels = c("Gleichstellung","Sozialstaat","Gesundheit", "Bildung",
+                                          "Umwelt","Verkehr", "Landwirtschaft", 
+                                          "Wirtschaft", "Finanzen","Arbeitsmarkt", 
+                                          "Migration", "Europa",  "Internationales",
+                                          "Milit?r","Recht/Ordnung",
+                                          "Kultur", "Medien",  "Nationaler Zusammenhalt"
+                       ),
+                       covariate.labels = c())
+
+# Geschlechterunterschied in der GPS
+lm_agric_gps <- lm(agric_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "GPS",])
+lm_econo_gps <- lm(econo_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "GPS",])
+lm_educ_gps <- lm(educ_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "GPS",])
+lm_cult_gps <- lm(cult_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "GPS",])
+lm_enven_gps <- lm(enven_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "GPS",])
+lm_europ_gps <- lm(europ_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "GPS",])
+lm_fntax_gps <- lm(fntax_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "GPS",])
+lm_gndis_gps <- lm(gndis_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "GPS",])
+lm_iasyl_gps <- lm(iasyl_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "GPS",])
+lm_intrel_gps <- lm(intrel_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "GPS",])
+lm_milit_gps <- lm(milit_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "GPS",])
+lm_arbmk_gps <- lm(arbmk_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "GPS",])
+lm_reord_gps <- lm(reord_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "GPS",])
+lm_phlth_gps <- lm(phlth_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "GPS",])
+lm_medkom_gps <- lm(medkom_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "GPS",])
+lm_vrkhr_gps <- lm(vrkhr_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "GPS",])
+lm_natzu_gps <- lm(natzu_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "GPS",])
+lm_swelf_gps <- lm(swelf_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "GPS",])
+
+table_GPS <- stargazer(lm_gndis_gps,lm_swelf_gps,lm_phlth_gps,lm_educ_gps,
+                       lm_enven_gps, lm_vrkhr_gps, lm_agric_gps, 
+                       lm_econo_gps,lm_fntax_gps, lm_arbmk_gps,
+                       lm_iasyl_gps, lm_europ_gps, lm_intrel_gps,
+                       lm_milit_gps, lm_reord_gps, 
+                       lm_cult_gps, lm_medkom_gps, lm_natzu_gps, 
+                       type = "latex", out = "C:/Users/Fiona/Desktop/Master/Online-Wahrnehmung von Politikerinnen/Daten/lm_GPS.html",
+                       title = c("Geschlechtereffekt bei der GPS"),
+                       dep.var.labels = c("Gleichstellung","Sozialstaat","Gesundheit", "Bildung",
+                                          "Umwelt","Verkehr", "Landwirtschaft", 
+                                          "Wirtschaft", "Finanzen","Arbeitsmarkt", 
+                                          "Migration", "Europa",  "Internationales",
+                                          "Milit?r","Recht/Ordnung",
+                                          "Kultur", "Medien",  "Nationaler Zusammenhalt"
+                       ),
+                       covariate.labels = c())
+
+# Geschlechterunterschied in der SVP
+lm_agric_svp <- lm(agric_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SVP",])
+lm_econo_svp <- lm(econo_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SVP",])
+lm_educ_svp <- lm(educ_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SVP",])
+lm_cult_svp <- lm(cult_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SVP",])
+lm_enven_svp <- lm(enven_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SVP",])
+lm_europ_svp <- lm(europ_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SVP",])
+lm_fntax_svp <- lm(fntax_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SVP",])
+lm_gndis_svp <- lm(gndis_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SVP",])
+lm_iasyl_svp <- lm(iasyl_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SVP",])
+lm_intrel_svp <- lm(intrel_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SVP",])
+lm_milit_svp <- lm(milit_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SVP",])
+lm_arbmk_svp <- lm(arbmk_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SVP",])
+lm_reord_svp <- lm(reord_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SVP",])
+lm_phlth_svp <- lm(phlth_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SVP",])
+lm_medkom_svp <- lm(medkom_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SVP",])
+lm_vrkhr_svp <- lm(vrkhr_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SVP",])
+lm_natzu_svp <- lm(natzu_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SVP",])
+lm_swelf_svp <- lm(swelf_rel_prc_wiki ~ gender + rat + status + age2019 + age2019_2 + region, data = df[df$party_short == "SVP",])
+
+table_SVP <- stargazer(lm_gndis_svp,lm_swelf_svp,lm_phlth_svp,lm_educ_svp,
+                       lm_enven_svp, lm_vrkhr_svp, lm_agric_svp, 
+                       lm_econo_svp,lm_fntax_svp, lm_arbmk_svp,
+                       lm_iasyl_svp, lm_europ_svp, lm_intrel_svp,
+                       lm_milit_svp, lm_reord_svp, 
+                       lm_cult_svp, lm_medkom_svp, lm_natzu_svp, 
+                       type = "latex", out = "C:/Users/Fiona/Desktop/Master/Online-Wahrnehmung von Politikerinnen/Daten/lm_SVP.html",
+                       title = c("Geschlechtereffekt bei der SVP"),
+                       dep.var.labels = c("Gleichstellung","Sozialstaat","Gesundheit", "Bildung",
+                                          "Umwelt","Verkehr", "Landwirtschaft", 
+                                          "Wirtschaft", "Finanzen","Arbeitsmarkt", 
+                                          "Migration", "Europa",  "Internationales",
+                                          "Milit?r","Recht/Ordnung",
+                                          "Kultur", "Medien",  "Nationaler Zusammenhalt"
+                       ),
+                       covariate.labels = c())
+
+
+# Geschlechterunterschied in der GLP
+lm_agric_glp <- lm(agric_rel_prc_wiki ~ gender + status + age2019 + age2019_2 , data = df[df$party_short == "GLP",])
+lm_econo_glp <- lm(econo_rel_prc_wiki ~ gender + status + age2019 + age2019_2 , data = df[df$party_short == "GLP",])
+lm_educ_glp <- lm(educ_rel_prc_wiki ~ gender + status + age2019 + age2019_2 , data = df[df$party_short == "GLP",])
+lm_cult_glp <- lm(cult_rel_prc_wiki ~ gender + status + age2019 + age2019_2 , data = df[df$party_short == "GLP",])
+lm_enven_glp <- lm(enven_rel_prc_wiki ~ gender + status + age2019 + age2019_2, data = df[df$party_short == "GLP",])
+lm_europ_glp <- lm(europ_rel_prc_wiki ~ gender + status + age2019 + age2019_2, data = df[df$party_short == "GLP",])
+lm_fntax_glp <- lm(fntax_rel_prc_wiki ~ gender + status + age2019 + age2019_2 , data = df[df$party_short == "GLP",])
+lm_gndis_glp <- lm(gndis_rel_prc_wiki ~ gender + status + age2019 + age2019_2 , data = df[df$party_short == "GLP",])
+lm_iasyl_glp <- lm(iasyl_rel_prc_wiki ~ gender + status + age2019 + age2019_2 , data = df[df$party_short == "GLP",])
+lm_intrel_glp <- lm(intrel_rel_prc_wiki ~ gender + status + age2019 + age2019_2 , data = df[df$party_short == "GLP",])
+lm_milit_glp <- lm(milit_rel_prc_wiki ~ gender + status + age2019 + age2019_2 , data = df[df$party_short == "GLP",])
+lm_arbmk_glp <- lm(arbmk_rel_prc_wiki ~ gender + status + age2019 + age2019_2 , data = df[df$party_short == "GLP",])
+lm_reord_glp <- lm(reord_rel_prc_wiki ~ gender + status + age2019 + age2019_2 , data = df[df$party_short == "GLP",])
+lm_phlth_glp <- lm(phlth_rel_prc_wiki ~ gender + status + age2019 + age2019_2 , data = df[df$party_short == "GLP",])
+lm_medkom_glp <- lm(medkom_rel_prc_wiki ~ gender + status + age2019 + age2019_2 , data = df[df$party_short == "GLP",])
+lm_vrkhr_glp <- lm(vrkhr_rel_prc_wiki ~ gender + status + age2019 + age2019_2 , data = df[df$party_short == "GLP",])
+lm_natzu_glp <- lm(natzu_rel_prc_wiki ~ gender + status + age2019 + age2019_2 , data = df[df$party_short == "GLP",])
+lm_swelf_glp <- lm(swelf_rel_prc_wiki ~ gender + status + age2019 + age2019_2 , data = df[df$party_short == "GLP",])
+lm_eu_int_glp <- lm(EU_int_rel_prc_wiki ~ gender +  status + age2019 + age2019_2, data = df[df$party_short == "GLP",])
+lm_env_vk_glp <- lm(env_vk_rel_prc_wiki ~ gender + status + age2019 + age2019_2, data = df[df$party_short == "GLP",])
+lm_econ_tax_glp <- lm(econ_tax_rel_prc_wiki ~ gender + status + age2019 + age2019_2, data = df[df$party_short == "GLP",])
+
+
+table_GLP <- stargazer(lm_gndis_glp,lm_swelf_glp,lm_phlth_glp,lm_educ_glp,
+                       lm_enven_glp, lm_vrkhr_glp, lm_env_vk_glp, lm_agric_glp, 
+                       lm_econo_glp,lm_fntax_glp, lm_econ_tax_glp, lm_arbmk_glp,
+                       lm_iasyl_glp, lm_europ_glp, lm_intrel_glp, lm_eu_int_glp,
+                       lm_milit_glp, lm_reord_glp, 
+                       lm_cult_glp, lm_medkom_glp, lm_natzu_glp, 
+                       type = "latex", out = "C:/Users/Fiona/Desktop/Master/Online-Wahrnehmung von Politikerinnen/Daten/lm_GLP.html",
+                       title = c("Geschlechtereffekt bei der GLP"),
+                       dep.var.labels = c("Gleichstellung","Sozialstaat","Gesundheit", "Bildung",
+                                          "Umwelt","Verkehr", "Umwelt, Energie, Verkehr", "Landwirtschaft", 
+                                          "Wirtschaft", "Finanzen","Wirtschaft, Finanzen", "Arbeitsmarkt", 
+                                          "Migration", "Europa",  "Internationales", "Europa, Internationales",
+                                          "Milit?r","Recht/Ordnung",
+                                          "Kultur", "Medien",  "Nationaler Zusammenhalt"
+                       ),
+                       covariate.labels = c())
+
+
+
+### Version zusammengef?hrte Politikfelder ###
+
+# f?r alle Parteien (CVP=Kontrollvariable)
+lm_agric <- lm(agric_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_econo <- lm(econo_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_educ <- lm(educ_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_cult <- lm(cult_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_enven <- lm(enven_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_europ <- lm(europ_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_fntax <- lm(fntax_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_gndis <- lm(gndis_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_iasyl <- lm(iasyl_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_intrel <- lm(intrel_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_milit <- lm(milit_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_arbmk <- lm(arbmk_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_reord <- lm(reord_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_phlth <- lm(phlth_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_medkom <- lm(medkom_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_vrkhr <- lm(vrkhr_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_natzu <- lm(natzu_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_swelf <- lm(swelf_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+
+lm_eu_int <- lm(EU_int_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_env_vk <- lm(env_vk_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+lm_econ_tax <- lm(econ_tax_rel_prc_wiki ~ gender + party_short + rat + status + age2019 + age2019_2 + region, data = df)
+
+
+
+df$party_short <- relevel(x = df$party_short, ref = "SP")
+
+table <- stargazer(lm_gndis,lm_swelf,lm_phlth,lm_educ,
+                   lm_enven, lm_vrkhr, lm_env_vk, lm_agric, 
+                   lm_econo,lm_fntax, lm_econ_tax,lm_arbmk,
+                   lm_iasyl, lm_europ, lm_intrel, lm_eu_int,
+                   lm_milit, lm_reord, 
+                   lm_cult, lm_medkom, lm_natzu, 
+                   type = "latex", out = "C:/Users/Fiona/Desktop/Master/Online-Wahrnehmung von Politikerinnen/Daten/lm_cvp_rk.html",
+                   title = c("Geschlechtereffekt ?ber alle Parteien"),
+                   dep.var.labels = c("Gleichstellung","Sozialstaat","Gesundheit", "Bildung",
+                                      "Umwelt","Verkehr", "Umwelt, Energie, Verkehr", "Landwirtschaft", 
+                                      "Wirtschaft", "Finanzen","Wirtschaft/Finanzen", "Arbeitsmarkt", 
+                                      "Migration", "Europa",  "Internationales", "Europa/Internationales",
+                                      "Milit?r","Recht/Ordnung",
+                                      "Kultur", "Medien",  "Nationaler Zusammenhalt"
+                   ),
+                   covariate.labels = c())

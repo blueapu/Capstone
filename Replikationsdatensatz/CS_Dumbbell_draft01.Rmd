@@ -1,0 +1,112 @@
+---
+title: "Dumbbell Chart Template _draft01_"
+author: "Markus Rottmann"
+date: "2020 05 08"
+output:
+  html_document:
+      toc: true
+      toc_depth: 5
+---
+
+****
+
+```{r setup, include=FALSE}
+
+## 0.1: cleaing memory
+rm(list=ls(all=T))
+
+## 0.2 defining options
+options(repos="https://cran.rstudio.com")
+options(stringsAsFactors = FALSE)
+
+## 0.3 installing and loading needed packages
+# install & load packages
+# install.packages("dplyr")
+library(dplyr)
+# install.packages("knitr")
+library(knitr)
+# install.packages("kableExtra")
+library(kableExtra)
+# install.packages("rvest")
+library(rvest)
+# install.packages("magrittr")
+library(magrittr)
+# install.packages("pageviews")
+library(pageviews)
+# install.packages("WikipediR")
+library(WikipediR)
+# install.packages("ggplot2")
+library(ggplot2)
+# install.packages("tibble")
+library(tibble)
+# install.packages("quanteda")
+library(quanteda)
+# install.packages("stargazer")
+library(stargazer)
+install.packages("ggalt")
+library(ggalt)
+
+
+
+```
+
+&nbsp;
+
+***
+
+
+### Change Log
+
+
+* *draft01*
+  + Template Dumbbell Chart Partei / Geschlecht
+    - Erstellen Datenframes
+    - Plot erstellen, Plot Zeigen, Plot Speichern
+  
+&nbsp;
+
+
+
+***
+
+### 1. Template Dumbbell-Chart
+
+```{r 01, include = TRUE, results = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
+
+## Erstellen Datenframes
+# Einzelne Ergebnisse für Parteien Eingeben (Mittelwerte)
+CVP <- c(party_short = "CVP", mann = 18, frau = 22)
+SP <- c(party_short = "SP", mann = 7, frau = 16)
+FDP <- c(party_short = "FDP", mann = 8, frau = 12)
+SVP <- c(party_short = "SVP", mann = 13.9, frau = 12)
+GLP <- c(party_short = "GLP", mann = 17.6, frau = 19.1)
+GPS <- c(party_short = "GPS", mann = 23, frau = 27)
+# binden zu Datenframe
+df_party_priv <- data.frame(rbind(CVP, SP, FDP, SVP, GLP, GPS))
+
+
+## Plot erstellen, Plot Zeigen, Plot Speichern
+# Plot erstellen
+plot_party_priv <- df_party_priv %>%
+  
+             ggplot(. , aes(x = mann, xend = frau, y = party_short)) +
+  
+             geom_dumbbell(colour = "#dddddd", size = 3,
+                           colour_x = "steelblue3", colour_xend = "indianred2") +
+
+            labs(x = "Anteil [%]", y = NULL) +
+  
+            theme(axis.text.y = element_text(size=12),
+                  axis.text.x = element_text(size=12)) +
+
+            theme_bw() 
+
+# Plot zeigen
+plot_party_priv
+
+# Plot abspeichern
+ggsave(plot_party_priv, file = "./GrafikenTabellen/plot_party_priv.png",
+       dpi = "retina", width = 15, height = 11, units = "cm")
+
+
+```
