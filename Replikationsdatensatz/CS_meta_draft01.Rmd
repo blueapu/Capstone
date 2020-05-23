@@ -1,0 +1,379 @@
+---
+title: "CS Meta, _draft01_"
+author: "Markus Rottmann"
+date: "2020-05-23"
+output:
+  html_document:
+      toc: true
+      toc_depth: 5
+---
+
+****
+
+```{r setup, include=FALSE}
+
+## 0.1: cleaing memory
+rm(list=ls(all=T))
+
+## 0.2 defining options
+options(repos="https://cran.rstudio.com")
+options(stringsAsFactors = FALSE)
+knitr::opts_chunk$set(echo = TRUE, fig.width = 7, fig.height = 5)
+
+## 0.3 installing and loading needed packages
+# install & load packages
+# install.packages("dplyr")
+library(dplyr)
+# install.packages("knitr")
+library(knitr)
+# install.packages("kableExtra")
+library(kableExtra)
+# install.packages("rvest")
+library(rvest)
+# install.packages("magrittr")
+library(magrittr)
+# install.packages("pageviews")
+library(pageviews)
+# install.packages("WikipediR")
+library(WikipediR)
+# install.packages("ggplot2")
+library(ggplot2)
+# install.packages("tibble")
+library(tibble)
+# install.packages("quanteda")
+library(quanteda)
+# insall.packages("stringr")
+library(stringr)
+
+```
+
+&nbsp;
+
+***
+
+
+#### Änderungsverlauf
+
+
+* *draft01*
+  + Erste Version.
+    
+***
+    
+&nbsp;
+
+#### Zusammenfassung
+
+Dieser Code erzeugt den Datensatz der Wikipedia-Metadaten (`df_meta_draft01.rds`), der Angaben wie Klickzahlen, Editierungen, Entstehungsdatum, etc. der Wikipedia-Einträge enthält.
+Grundlage ist der Basisdatensatz `df_base_draft01.RDS`.
+
+
+ + Angaben zu Einzelnachweisen und Weblinks: 2019-12-31.
+ + Die Editierungen und Klickzahlen beziehen sich auf die Zeiträume:
+    - 20. August bis 19. Oktober 2019
+    - 20. Oktober bis 31. Oktober 2019
+    - 01. November bis 31. Dezember 2019
+
+
+&nbsp;
+
+
+***
+
+&nbsp;
+
+
+#### 1. Einlesen des Grunddatensatzes
+
+```{r 01, include = TRUE, results = TRUE, eval = TRUE, message = FALSE, warning = FALSE}
+
+## Einlesen Grunddatensatz & Auswahl relevanter Variablen
+df_meta_draft01 <- readRDS("./Rohdaten/df_base_draft01.rds") %>% 
+  select(., "wiki_id", "lastname", "firstname", "wiki_url", "wiki_old_url", "wiki_name")
+
+```
+
+&nbsp;
+
+
+***
+
+&nbsp;
+
+
+#### 2. Ermitteln der Editierungen (3 Zeiträume)
+
+```{r 02, include = TRUE, results = TRUE, eval = TRUE, message = FALSE, warning = FALSE}
+
+## Ergebsvariablen schaffen
+df_meta_draft01$wiki_edt_prb_a <- as.numeric(NA)
+df_meta_draft01$wiki_edt_prb_b <- as.numeric(NA)
+df_meta_draft01$wiki_edt_prb_c <- as.numeric(NA)
+df_help <- as.data.frame(NA)
+
+## Abragen und Summieren der Editierungen in den drei Zeiträumen im Loop
+for(i in 1:nrow(df_meta_draft01)) {
+    df_help <- try(read_html(paste0("https://de.wikipedia.org/w/index.php?title=",
+                                     df_meta_draft01$wiki_name[i],
+                                     "&limit=500&action=history")) %>% 
+                html_nodes(".mw-changeslist-date")  %>% 
+                html_text() %>%
+                gsub("Mai", "Mai.", .) %>% 
+                gsub("\\.\\.", ".", .) %>%
+                as.Date("%H:%M, %e. %b. %Y")) %>% 
+                table(.) %>%
+                as.data.frame(.) %>% 
+                `colnames<-`(c("date", "edt")) 
+              
+    df_help$date <- as.Date(df_help$date, "%Y-%m-%d")
+                
+    df_meta_draft01$wiki_edt_prb_a[i] <- df_help[which(df_help[ , "date"]  >= "2019-08-20" & df_help[ , "date"] <= "2019-10-19") , 2] %>%
+    sum(.)
+    df_meta_draft01$wiki_edt_prb_b[i] <- df_help[which(df_help[ , "date"]  >= "2019-10-20" & df_help[ , "date"] <= "2019-10-31") , 2]  %>%
+    sum(.)
+    df_meta_draft01$wiki_edt_prb_c[i] <- df_help[which(df_help[ , "date"]  >= "2019-11-01" & df_help[ , "date"] <= "2019-12-31") , 2]  %>%
+   sum(.)
+      
+}
+
+df_meta_draft01$wiki_edt_tot <- as.numeric(df_meta_draft01$wiki_edt_prb_a + df_meta_draft01$wiki_edt_prb_b + df_meta_draft01$wiki_edt_prb_c)
+
+## Hilfsvariablen Löschen
+rm(df_help, i)
+
+```
+
+&nbsp;
+
+***
+
+&nbsp;
+
+#### 3. Ermitteln der Klickzahlen (3 Zeiträume)
+
+##### 3.1 Abfrage der Klicks
+
+```{r 03_01a, include = TRUE, results = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
+
+## Daten vorbereiten
+# leere Resultatsliste erstellen
+pgvw <- as.list(rep(NA, nrow(df_meta_draft01)))
+
+# Zeitrahmen definieren
+tp_srt = "2019082000"
+tp_end = "2019123100"
+
+## Wikipedia-Abfrage aller Klicks pro Eintrag & Speichern in Liste im Loop
+for (i in 1:nrow(df_meta_draft01)){
+                pgvw[[i]] <- try(article_pageviews(project = "de.wikipedia",
+                article = df_meta_draft01[i, "wiki_name"],
+                user_type = "user",
+                start = tp_srt,
+                end = tp_end ))
+}
+
+## Resultate auslesen & mit Variablen versehen
+# Aufstellen
+df_pgvw_raw <- data.frame(project = as.character(NA), language = as.character(NA), article = as.character(NA),
+                     access = as.character(NA), agent = as.character(NA), granularity = as.character(NA),
+                     date = as.Date(NA, "%Y-%m-%d"), views = as.numeric(NA), wiki_id = as.numeric(NA))
+                     
+#  Erzeugen der Rohen-Klick-Ergebnisse laufen lassen
+for(i in (1:length(pgvw)))try({
+  df_pgvw_raw0 <- pgvw[[i]]
+  df_pgvw_raw0 <- add_column(df_pgvw_raw0, wiki_id = as.numeric(df_meta_draft01$wiki_id[i]))
+  df_pgvw_raw <- (rbind(df_pgvw_raw0, df_pgvw_raw))
+})
+  
+
+## Speichern des Datensatzes (Abfrage dauert lange)
+df_pgvw_raw <- df_pgvw_raw %>% 
+  select(., wiki_id, date, views)
+saveRDS(df_pgvw_raw, "./Rohdaten/df_pgvw_raw.rds")
+
+
+## Löschen der Hilfsvariablen
+# [YYY] rm(df_pgvw_raw, df_pgvw_raw0, pgvw, i, tp_end, tp_srt)
+
+```
+
+
+***
+
+&nbsp;
+
+##### 3.2 Aggregieren der Klicks (3 Zeiträume)
+
+```{r 03_03, include = TRUE, results = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
+
+## Daten Laden
+data01 <- readRDS("./Rohdaten/df_pgvw_raw.rds")
+
+## Aggregieren der Rohdaten df_pgvw_raw.rds in den drei Zeiteinheiten
+# Ermitteln aller vorhandenen wiki_ids
+wiki_id_val <- data01$wiki_id %>% 
+  na.omit(.) %>% 
+  unique(.)
+
+# Erstellen resultat-df im Loop, Loop für alle vorhandene wiki_ids
+df_res <- data.frame(wiki_id = as.numeric(NA), wiki_pgvw_prd_a = NA, wiki_pgvw_prd_b = NA, wiki_pgvw_prd_c = NA)
+for (i in wiki_id_val) {
+    df_i <- data01 %>% 
+                 filter(., wiki_id == i)
+      
+    wiki_pgvw_prd_a  <- df_i[which(df_i[ , "date"]  >= "2019-08-20" & df_i[ , "date"] <= "2019-10-19") ,
+                                                  "views"] %>%
+                                                   sum(.)
+    wiki_pgvw_prd_b <- df_i[which(df_i[ , "date"]  >= "2019-10-20" & df_i[ , "date"] <= "2019-10-31"),
+                                                  "views"]  %>%
+                                                  sum(.)
+    wiki_pgvw_prd_c <- df_i[which(df_i[ , "date"]  >= "2019-11-01" & df_i[ , "date"] <= "2019-12-31") ,
+                                                  "views"]  %>%
+                                                   sum(.)
+    wik_id_tmp <- i
+    df_res0 <- c(wiki_id = wik_id_tmp, wiki_pgvw_prd_a = wiki_pgvw_prd_a,
+                 wiki_pgvw_prd_b = wiki_pgvw_prd_b, wiki_pgvw_prd_c = wiki_pgvw_prd_c)
+    
+    df_res <- rbind(df_res, df_res0)
+
+}
+
+## Erzeugung der Summe der Klicks
+df_res$wiki_pgvw_tot <- df_res$wiki_pgvw_prd_a + df_res$wiki_pgvw_prd_b + df_res$wiki_pgvw_prd_c
+df_res$wiki_id <- as.numeric(as.character(df_res$wiki_id))
+
+
+## Ergebnisse Zusammenführen 
+df_meta_draft01 <- merge(df_meta_draft01, df_res, by = "wiki_id", all.x = TRUE)
+
+
+## Hilfsvariablen löschen
+rm(i, df_res, df_res0, wiki_id_val, data01, wiki_pgvw_prd_a,
+   wiki_pgvw_prd_b, wiki_pgvw_prd_c)
+
+```
+
+&nbsp;
+
+***
+
+&nbsp;
+
+#### 4. Ermitteln des Entstehungszeitpunktes, Anzahl Weblinks und Einzelnachweisen
+
+##### 4.1 Ermitteln des Entstehungszeitpunktes
+
+```{r 04_01, include = TRUE, results = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
+
+## Ergebsvariable schaffen
+df_meta_draft01$wiki_seit<- as.character(NA)
+
+## Datum der ersten Änderung (= Entstehungszeitpunkt) in loop abfragen
+for (i in 1:nrow(df_meta_draft01)) try({
+    df_meta_draft01$wiki_seit[i] <- read_html(paste0("https://de.wikipedia.org/w/index.php?title=",
+                                          df_meta_draft01$wiki_name[i],
+                                          "&dir=prev&action=history")) %>% 
+                                            html_nodes(".mw-changeslist-date") %>% 
+                                            html_text() %>% 
+                                            tail(1)
+})
+
+
+## Hilfsvariable löschen
+rm(i)
+
+```
+
+***
+
+&nbsp;
+
+##### 4.2 Ermitteln der Anzahl Weblinks (ausser Wikipedia-Links)
+
+```{r 04_02, include = TRUE, results = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
+
+## Neue Variable erstellen wblnk_no
+df_meta_draft01$wblnk_no <- as.numeric(NA)
+h_lst <- as.numeric(NA)
+
+## Abfrage-Loop zum Zählen der Weblinks (ausser Wikipedia-Links)
+for (i in 1:nrow(df_meta_draft01)) try( {
+  
+  h_lst <- df_meta_draft01[i, "wiki_old_url"] %>% 
+           read_html(.) %>% 
+           html_nodes("ul .text") %>% 
+           html_attr("href")
+
+  # Löschen der internen (wiki)-Links & Zählen
+  df_meta_draft01$wblnk_no[i] <- h_lst[!(grepl("/wiki/", h_lst))] %>%
+                                  length(.)
+
+
+} )
+
+## Hilfsvariable löschen
+rm(h_lst, i)
+
+```
+***
+
+&nbsp;
+
+##### 4.3 Ermitteln der Anzahl Einzelnachweise  (ausser Wikipedia-Links)
+
+```{r 04_03, include = TRUE, results = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
+
+## Erstellen leere variable Einzelnachweise
+df_meta_draft01$ezlnk_no <- as.numeric(NA)
+
+## Loop zum Zählen der Links in Einzelnachweisen
+for (i in 1:nrow(df_meta_draft01)) try( {
+  
+  lst_yy <- read_html(df_meta_draft01[i, "wiki_old_url"]) %>% 
+                                html_nodes(".references") %>% 
+                                html_nodes("li") %>% 
+                                html_nodes(".reference-text") %>% 
+                                html_nodes("a") %>% 
+                                html_attr("href")
+  
+  # Löschen der internen (wiki)-Links & Zählen
+  df_meta_draft01$ezlnk_no[i] <- lst_yy[!(grepl("/wiki/", lst_yy))] %>%
+                                  length(.)
+  
+} )
+
+## Hilfsvariable löschen
+rm(lst_yy, i)
+
+```
+
+
+&nbsp;
+
+***
+
+&nbsp;
+
+
+#### 5. Anzeigen und Speichern des Basisdatensatzes `df_meta_draft01.RDS`
+
+```{r 05, include = TRUE, results = TRUE, eval = TRUE, message = FALSE, warning = FALSE}
+
+## Speichern & Anzeigen des Basisdatensatzes
+saveRDS(df_meta_draft01, file = ("./Rohdaten/df_meta_draft01.rds"))
+
+## Anzeigen des Basisdatensatzes
+df_meta_draft01 %>% 
+    kable(., caption = "Meta-Datensatz, roh",
+          row.names = FALSE) %>%
+    kable_styling(bootstrap_options = c("striped", "responsive"), 
+    full_width = TRUE, position = "center") %>% 
+    scroll_box(., height = "800px")
+
+## Hilfsdaten Löschen        
+rm(df_meta_draft01)
+
+
+
+```
+

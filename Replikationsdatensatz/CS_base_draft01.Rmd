@@ -1,0 +1,360 @@
+---
+title: "CS Base, _draft01_"
+author: "Markus Rottmann"
+date: "2020-05-22"
+output:
+  html_document:
+      toc: true
+      toc_depth: 5
+---
+
+****
+
+```{r setup, include=FALSE}
+
+## 0.1: cleaing memory
+rm(list=ls(all=T))
+
+## 0.2 defining options
+options(repos="https://cran.rstudio.com")
+options(stringsAsFactors = FALSE)
+knitr::opts_chunk$set(echo = TRUE, fig.width = 7, fig.height = 5)
+
+## 0.3 installing and loading needed packages
+# install & load packages
+# install.packages("dplyr")
+library(dplyr)
+# install.packages("knitr")
+library(knitr)
+# install.packages("kableExtra")
+library(kableExtra)
+# install.packages("rvest")
+library(rvest)
+# install.packages("magrittr")
+library(magrittr)
+# install.packages("pageviews")
+library(pageviews)
+# install.packages("WikipediR")
+library(WikipediR)
+# install.packages("ggplot2")
+library(ggplot2)
+# install.packages("tibble")
+library(tibble)
+# install.packages("quanteda")
+library(quanteda)
+# install.packages("stringr")
+library(stringr)
+```
+
+&nbsp;
+
+***
+
+#### Änderungsverlauf
+
+
+* *draft01*
+  + Erste Version.
+    
+***
+    
+&nbsp;
+
+#### Zusammenfassung
+
+Dieser Code erzeugt den Basisdatensatz (`df_base_draft01.RDS`) der neben Angaben über Alter (2019), Partei, Kommissionsangehörigkeit, etc. auch die Wikipedia-Adressen erhält. 
+
+
+ + die Grunddatensätze `2019_chvote_nationalcouncil.csv` und `2019_chvote_councilofstates.csv` stammen von [_smartvote_](https://www.smartvote.ch/de/home).
+ + der Datensatz zum Status, und Rats- und Kommissionszugehörigkeiten `df_parldate.rds` stammen von der [Parlaments-Webpage](https://www.parlament.ch/de/organe/nationalrat/mitglieder-nationalrat-a-z).
+ + die Wikipedia-Adresse per 2020-05-23 wird hier ermittelt (Variable `wiki_url`)
+ + die Wikipedia-Adresse per 2019-12-13 wird hier ermittelt (Variable `wiki_old_url`).
+ + die Variable `wiki_id` dient der besseren Datenverarbeitung und ist zufällig vergeben.
+ + das Ergebnis dieses Codes ist der Datensatz `df_base_draft01.rds`.
+
+&nbsp;
+
+***
+
+&nbsp;
+
+
+#### 1. Einlesen der Grunddatensätze von _smartvote_ (Kandidat*innen eidg. Wahlen 2019).
+
+
+```{r 01, include = TRUE, results = TRUE, eval = TRUE, message = FALSE, warning = FALSE}
+
+## Einlesen & Vereinigen der Grunddatensätze von smartvote
+# Einlesen der Grunddatensäte für National- und Ständeratsmitglieder
+df_nr <- read.csv("./Rohdaten/2019_chvote_nationalcouncil.csv", encoding = "UTF-8") %>% 
+  select(., -c("list", "list_place_1", "list_place_2" ,"X", "incumbent", "age",
+               "LINK_personal_website", "LINK_facebook", "LINK_Twitter","LINK_Instagram"))
+  
+df_sr <- read.csv("./Rohdaten/2019_chvote_councilofstates.csv", encoding = "UTF-8") %>% 
+  select(., -c("incumbent","age", "LINK_personal_website", "LINK_facebook", "LINK_Twitter",
+               "LINK_Instagram"))
+colnames(df_sr)[1] <-  "firstname" # Variablennamen mit df_nr harmonisieren
+
+# Zusammenführen der Grunddatensäte für National- und Ständeratsmitglieder
+df_base_draft01 <- rbind(df_nr, df_sr)
+
+
+## Löschen Hilfsdaten
+rm(df_nr, df_sr)
+
+
+```
+
+&nbsp;
+
+***
+
+&nbsp;
+
+
+#### 2. Eingabe der Parlamentsdaten (z.B. Kommissionen, Status, etc.) & Nachtrag Hannes Germann & Thomas Hurter.
+
+```{r 02, include = TRUE, results = TRUE, eval = TRUE, message = FALSE, warning = FALSE}
+
+## Zuordnen der Parlamentsdaten (Quelle: parlament.ch)
+# Einlesen der Parlamentsdaten (alle: per 2019-12-31)
+df_parldata <- readRDS("./Rohdaten/df_parldata.RDS")
+
+# Zuordnen des Staus, der Rats- & Kommissionszugehörigkeit
+df_base_draft01 <- merge(df_parldata, df_base_draft01, by = c("lastname", "firstname"))
+
+
+## Löschen der Nicht-Parlamentarier & Verdoppelungen (Kandidaten für NR und SR)
+df_base_draft01 <- df_base_draft01 %>% 
+  filter(., rat %in% c("NR", "SR"))
+df_base_draft01 <- df_base_draft01[which(!duplicated(df_base_draft01$wiki_id)), ]
+
+
+## Nachtrag Hurter und Germann
+# Thomas Hurter
+hurter_amnd <- c(lastname = "Hurter", firstname = "Thomas", wiki_id = "97", rat = "NR", status = "bisher", 
+                Bu = 0, FK = 0, GPK = 0, APK = 0, WBK = 0, SGK = 0, UREK = 0, SiK = 1, KVF = 1, WAK = 0,
+                SPK = 0, RK = 0, LPK = 0, gender = "m", year_of_birth = 1963, zip = NA ,
+                city = NA, country = NA, party_short = "SVP", district = "Schaffhausen")
+
+# Hannes Germann
+germann_amnd <- c(lastname = "Germann", firstname = "Hannes", wiki_id = "225", rat = "SR", status = "bisher", 
+                Bu = 0, FK = 0, GPK = 0, APK = 0, WBK = 1, SGK = 1, UREK = 0, SiK = 1, KVF = 1, WAK = 1,
+                SPK = 0, RK = 0, LPK = 0, gender = "m", year_of_birth = 1956, zip = NA ,
+                city = NA, country = NA, party_short = "SVP", district = "Schaffhausen")
+
+# Nachträge mit Basisdatensatz verbinden
+df_base_draft01 <- rbind(df_base_draft01, hurter_amnd, germann_amnd)
+
+
+## Löschen Hilfsdaten
+rm(hurter_amnd, germann_amnd, df_parldata)
+
+```
+
+&nbsp;
+
+***
+
+&nbsp;
+
+
+#### 3. Berechnen Alter (2019), Zuweisung Sprachregionen, Zuweisung Kleinparteien.
+
+```{r 03, include = TRUE, results = TRUE, eval = TRUE, message = FALSE, warning = FALSE}
+
+## Berechnen der Alters-Variablen age2019 und age2019_2 (Alter^2)
+df_base_draft01$year_of_birth <- as.numeric(as.character(df_base_draft01$year_of_birth))
+df_base_draft01$age2019 <- (2019 - df_base_draft01$year_of_birth)
+df_base_draft01$age2019_2 <- df_base_draft01$age2019*df_base_draft01$age2019
+
+## Zuweisung der Sprachregion
+df_base_draft01$region <- as.character("deu")
+df_base_draft01$region <- ifelse(df_base_draft01$district == "Waadt" | df_base_draft01$district == "Genf" | df_base_draft01$district == "Jura" | df_base_draft01$district == "Wallis" | df_base_draft01$district == "Neuenburg" | df_base_draft01$district == "Freiburg" | df_base_draft01$district == "Tessin", "lat", df_base_draft01$region)
+df_base_draft01$region <- as.factor(df_base_draft01$region)
+
+## Zuweisung der Kleinparteien zu Fraktionen
+df_base_draft01$party_short[df_base_draft01$party_short=="ALG"] <- "GPS"
+df_base_draft01$party_short[df_base_draft01$party_short=="BastA!"] <- "GPS"
+df_base_draft01$party_short[df_base_draft01$party_short=="PdA"] <- "GPS"
+df_base_draft01$party_short[df_base_draft01$party_short=="solid."] <- "GPS"
+df_base_draft01$party_short[df_base_draft01$party_short=="LDP"] <- "FDP"
+df_base_draft01$party_short[df_base_draft01$party_short=="EVP"] <- "CVP"
+df_base_draft01$party_short[df_base_draft01$party_short=="BDP"] <- "CVP"
+df_base_draft01$party_short[df_base_draft01$party_short=="EDU"] <- "SVP"
+df_base_draft01$party_short[df_base_draft01$party_short=="Lega"] <- "SVP"
+df_base_draft01$party_short[df_base_draft01$party_short=="SD"] <- "SVP"
+df_base_draft01$party_short[df_base_draft01$party_short=="Parteilos"] <- "SVP"
+
+```
+
+&nbsp;
+
+***
+
+&nbsp;
+
+
+#### 4. Ermitteln der aktuellen Wikipedia-URL der per 2019-12-31
+
+##### 4.1 Ermitteln der aktuellen (2020-05-23) Wikipedia-URL
+
+```{r 04_01, include = TRUE, results = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
+
+### Nationalratsmitglieder
+## url definieren
+url_nat <- "https://de.wikipedia.org/wiki/Liste_der_Mitglieder_des_Schweizer_Nationalrats_in_der_51._Legislaturperiode"
+
+## teil-url aus liste extrahieren...
+#  ... funktioniert leider nur inklusive den letzten 29 Einträgen
+prtlk_nat <- read_html(url_nat) %>% html_nodes("td:nth-child(1) a") %>% 
+             html_attr("href")
+
+## namen aus liste extrahieren...
+#  ... funktioniert leider nur inklusive den letzten 29 Einträgen
+nm_nat <- read_html(url_nat) %>% html_nodes("td:nth-child(1) a") %>% 
+          html_text()
+
+pnm_nat <- read_html(url_nat) %>% html_nodes("td:nth-child(1) a") %>% 
+           html_attr("href") %>% 
+           basename(.)
+
+## zusammenführen der url und Namen
+df_wiki_nat <- cbind.data.frame(nm_nat, prtlk_nat, pnm_nat)
+
+# df auf 200 beschneiden (ging nicht anders wg. css anwählen)
+df_wiki_nat <- df_wiki_nat[1:200, ]
+
+# link vervollständigen, hilfsvariable löschen, Variable...
+# ...wiki_rat einführen und variablen benennen
+df_wiki_nat$wiki_url <- paste0("https://de.wikipedia.org", df_wiki_nat$prtlk_nat)
+df_wiki_nat$prtlk_nat <- NULL # hilfsvariable löschen
+df_wiki_nat$wiki_rat <- "NR"
+colnames(df_wiki_nat) <- c("name", "wiki_name", "wiki_url", "wiki_rat")
+
+
+### Ständeratsmitglieder
+## url definieren
+url_sta <- "https://de.wikipedia.org/wiki/Liste_der_Mitglieder_des_Schweizer_St%C3%A4nderats_in_der_51._Legislaturperiode"
+
+## teil-url aus liste extrahieren...
+#  ... funktioniert leider nur inklusive den letzten Einträgen
+prtlk_sta <- read_html(url_sta) %>% html_nodes("td:nth-child(1) a") %>% 
+             html_attr("href")
+
+## namen aus liste extrahieren...
+#  ... funktioniert leider nur inklusive den letzten Einträgen
+nm_sta <- read_html(url_sta) %>% html_nodes("td:nth-child(1) a") %>% 
+          html_text()
+
+pnm_sta <- read_html(url_sta) %>% html_nodes("td:nth-child(1) a") %>% 
+           html_attr("href") %>% 
+           basename(.)
+
+
+## zusammenführen der url und Namen
+df_wiki_sta <- cbind.data.frame(nm_sta, prtlk_sta, pnm_sta)
+# df auf 46 beschneiden (ging nicht anders wg. css anwählen)
+df_wiki_sta <- df_wiki_sta[1:46, ]
+
+## link vervollständigen, hilfsvariable löschen Variablen...
+# ...wiki_rat" einfügen und variablen benennen
+df_wiki_sta$wiki_url <- paste0("https://de.wikipedia.org", df_wiki_sta$prtlk_sta)
+df_wiki_sta$prtlk_sta <- NULL # hilfsvariable löschen
+df_wiki_sta$wiki_rat <- "SR"
+colnames(df_wiki_sta) <- c("name", "wiki_name", "wiki_url", "wiki_rat")
+
+## Hilfsaten Löschen
+rm(nm_nat, nm_sta, pnm_nat, pnm_sta, prtlk_nat, prtlk_sta, url_nat, url_sta)
+
+```
+
+***
+
+&nbsp;
+
+
+##### 4.2 Ermitteln der Wikipedia-URL per 2019-12-31
+
+```{r 04_02, include = TRUE, results = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
+
+## Nationalrats- und Ständerats df verbinden
+df_wiki <- rbind.data.frame(df_wiki_nat, df_wiki_sta)
+df_wiki$wiki_old_url <- as.numeric(NA)
+
+## Loop, der die letzten wiki-links vor 2020-01-01 sucht und einliest
+for (i in 1:nrow(df_wiki)) try({
+
+  h_date <- read_html(paste0("https://de.wikipedia.org/w/index.php?title=",
+                            df_wiki$wiki_name[i],
+                            "&action=history")) %>% 
+                            html_nodes(".mw-changeslist-date") %>% 
+                            html_text() %>%
+                            gsub("Mai", "Mai.", .) %>% 
+                            gsub("\\.\\.", ".", .) %>%
+                            as.Date("%H:%M, %e. %b. %Y")
+        
+  h_link <- read_html(paste0("https://de.wikipedia.org/w/index.php?title=",
+                            df_wiki$wiki_name[i],
+                            "&action=history")) %>%
+                            html_nodes(".mw-changeslist-date") %>% 
+                            html_attr("href")
+                  
+ h_df <- cbind.data.frame(h_date, h_link) %>% 
+        `colnames<-`(., c("date", "prt_lnk"))             
+                  
+ df_wiki$wiki_old_url[i] <- h_df[which(h_df[ , "date"] < "2020-01-01"), 2] %>% 
+                                   head(1) %>% paste0("https://de.wikipedia.org", .)
+              
+})
+
+## Umwandeln der Einträge, die nach dem 2020-01-01 erstellt wurden...
+# ...in NA (die haben den Eintrag "https://de.wikipedia.org" oder "index.php?title..."
+df_wiki$wiki_old_url <- ifelse(df_wiki$wiki_old_url == "https://de.wikipedia.org", NA, df_wiki$wiki_old_url)
+df_wiki$wiki_name <- ifelse(str_detect(df_wiki$wiki_name, "index.php"), NA, df_wiki$wiki_name)
+
+
+## Zuordnen der beiden Datenframes
+# erstellen zuordnungs-Variable "mrg_first" und "mrg_last"
+df_wiki$mrg_first <- stringr::word(df_wiki$name, 1)
+df_wiki$mrg_last <- stringr::word(df_wiki$name, -1)
+df_base_draft01$mrg_first <- stringr::word(df_base_draft01$firstname, 1)
+df_base_draft01$mrg_last <- stringr::word(df_base_draft01$lastname, -1)
+
+# Verbindung und Löschen der Hilfsvariablen "mrg_first" und "mrg_last", etc.
+df_base_draft01 <- merge(df_base_draft01, df_wiki, by = c("mrg_last", "mrg_first"), all.x = TRUE)
+df_base_draft01[, c("mrg_last", "mrg_first", "wiki_rat", "name")] <- NULL
+
+
+## Hilfsdaten löschen
+rm(h_date, h_link, h_df, df_wiki_nat, df_wiki_sta, df_wiki, i)
+
+```
+
+
+&nbsp;
+
+***
+
+&nbsp;
+
+#### 5. Speichern und Anzeigen des Basisdatensatzes `df_base_draft01.rds`
+
+```{r 05, include = TRUE, results = TRUE, eval = TRUE, message = FALSE, warning = FALSE}
+
+## Speichern & Anzeigen des Basisdatensatzes
+saveRDS(df_base_draft01, file = ("./Rohdaten/df_base_draft01.rds"))
+
+## Anzeigen des Basisdatensatzes
+df_base_draft01 %>% 
+    kable(., caption = "Basisdatensatz, roh",
+          row.names = FALSE) %>%
+    kable_styling(bootstrap_options = c("striped", "responsive"), 
+    full_width = TRUE, position = "center") %>% 
+    scroll_box(., height = "800px")
+
+## Hilfsdaten Löschen        
+rm(df_base_draft01)
+
+```
+

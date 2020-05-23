@@ -1,0 +1,120 @@
+---
+title: "CS Alldata, _draft01_"
+author: "Markus Rottmann"
+date: "2020-05-23"
+output:
+  html_document:
+      toc: true
+      toc_depth: 5
+---
+
+****
+
+```{r setup, include=FALSE}
+
+## 0.1: cleaing memory
+rm(list=ls(all=T))
+
+## 0.2 defining options
+options(repos="https://cran.rstudio.com")
+options(stringsAsFactors = FALSE)
+knitr::opts_chunk$set(echo = TRUE, fig.width = 7, fig.height = 5)
+
+## 0.3 installing and loading needed packages
+# install & load packages
+# install.packages("dplyr")
+library(dplyr)
+# install.packages("knitr")
+library(knitr)
+# install.packages("kableExtra")
+library(kableExtra)
+# install.packages("rvest")
+library(rvest)
+# install.packages("magrittr")
+library(magrittr)
+# install.packages("pageviews")
+library(pageviews)
+# install.packages("WikipediR")
+library(WikipediR)
+# install.packages("ggplot2")
+library(ggplot2)
+# install.packages("tibble")
+library(tibble)
+# install.packages("quanteda")
+library(quanteda)
+
+```
+
+&nbsp;
+
+***
+
+
+#### Änderungsverlauf
+
+
+* *draft01*
+  + Zusammenführen der Datensätze `df_base_draft01.rds`, `df_meta_draft01.rds` und `df_txt_draft01.rds` zum Ergebnisdatensatz `df_alldata_draft01.RDS`.
+  
+***
+    
+&nbsp;
+
+#### Zusammenfassung
+
+Dieser Code erzeugt Ergebnisdatenstz `df_alldata_draft01.RDS`.
+`df_alldata_draft01.RDS` ist die Grundlage für alle Berechnungen und Darstellungen *alliance F*'s Projekt _Online von Politikerinnen in der Schweiz_.
+Grundlage sind die Datensätze `df_base_draft01.RDS`, `df_meta_draft01.RDS` und `df_txt_draft01`.
+
+
+***
+
+&nbsp;
+
+
+#### 1. Einlesen & Vereinigung der Datensätze `df_base_draft01.RDS`, `df_meta_draft01.RDS` und `df_txt_draft01.RDS`
+
+```{r 01, include = TRUE, results = TRUE, eval = TRUE, message = FALSE, warning = FALSE}
+
+## Laden der Datensätze & Auswahl der wichtigen 
+data00 <- readRDS("./Rohdaten/df_base_draft01.rds")
+data01 <- readRDS("./Rohdaten/df_meta_draft01.rds") %>% 
+  select(., -c("lastname", "firstname", "wiki_url", "wiki_old_url", "wiki_name"))
+data02 <- readRDS("./Rohdaten/df_txt_draft01.rds") %>% 
+ select(., -c("lastname", "firstname", "wiki_url", "wiki_old_url", "wiki_name"))
+
+## Vereinigen der datensätze
+df_alldata_draft01 <- merge(data00, data01, by = "wiki_id", all.x = TRUE)
+df_alldata_draft01 <- merge(df_alldata_draft01, data02, by = "wiki_id", aall.x = TRUE)
+
+## Löschen der Hilfvariablen
+rm(data01, data02, data00)
+
+```
+
+***
+
+&nbsp;
+
+
+#### 2. Speichern des Ergebnisdatensatzes `df_alldata_draft01.RDS`
+
+```{r 02, include = TRUE, results = TRUE, eval = TRUE, message = FALSE, warning = FALSE}
+
+## Speichern & Anzeigen des Ergenisdatensatzes
+saveRDS(df_alldata_draft01, file = ("./Rohdaten/df_alldata_draft01.rds"))
+
+## Anzeigen des Basisdatensatzes
+df_alldata_draft01 %>% 
+    kable(., caption = "Alle Daten, roh",
+          row.names = FALSE) %>%
+    kable_styling(bootstrap_options = c("striped", "responsive"), 
+    full_width = TRUE, position = "center") %>% 
+    scroll_box(., height = "800px")
+
+## Hilfsdaten Löschen        
+rm(df_alldata_draft01)
+
+
+```
+

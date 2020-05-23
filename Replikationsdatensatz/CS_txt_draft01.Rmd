@@ -1,0 +1,348 @@
+---
+title: "CS txt, _draft01_"
+author: "Markus Rottmann"
+date: "2020-05-23"
+output:
+  html_document:
+      toc: true
+      toc_depth: 5
+---
+
+****
+
+```{r setup, include=FALSE}
+
+## 0.1: cleaing memory
+rm(list=ls(all=T))
+
+## 0.2 defining options
+options(repos="https://cran.rstudio.com")
+options(stringsAsFactors = FALSE)
+knitr::opts_chunk$set(echo = TRUE, fig.width = 7, fig.height = 5)
+
+## 0.3 installing and loading needed packages
+# install & load packages
+# install.packages("dplyr")
+library(dplyr)
+# install.packages("knitr")
+library(knitr)
+# install.packages("kableExtra")
+library(kableExtra)
+# install.packages("rvest")
+library(rvest)
+# install.packages("magrittr")
+library(magrittr)
+# install.packages("pageviews")
+library(pageviews)
+# install.packages("WikipediR")
+library(WikipediR)
+# install.packages("ggplot2")
+library(ggplot2)
+# install.packages("tibble")
+library(tibble)
+# install.packages("quanteda")
+library(quanteda)
+# install.packages("stringr")
+library(stringr)
+
+```
+
+&nbsp;
+
+***
+
+
+#### Änderungsverlauf
+
+
+* *draft01*
+  + Erste VErsion
+    
+***
+    
+&nbsp;
+
+#### Zusammenfassung
+
+Dieser Code erzeugt den Datensatz der Wikipedia-Textanalyse (`df_txt_draft01.RDS`). Dazu werden die Wörterbücher für die Lebens- und Politikbereiche erstellt, die eigentliche Textanalyse durchgeführt und die Ergebnisse abgespeichert.
+Grundlage ist der Basisdatensatz `df_base_draft01.rds`.
+
+&nbsp;
+
+***
+
+&nbsp;
+
+
+#### 1. Einlesen des Grunddatensatzes
+
+```{r 01, include = TRUE, results = TRUE, eval = TRUE, message = FALSE, warning = FALSE}
+
+## Einlesen Grunddatensatz & Auswahl relevanter Variablen
+df_txt_draft01 <- readRDS("./Rohdaten/df_base_draft01.rds") %>% 
+  select(., "wiki_id", "lastname", "firstname", "wiki_url", "wiki_old_url", "wiki_name")
+
+```
+
+&nbsp;
+
+***
+
+&nbsp;
+
+#### 2. Herunterladen der Wikipedia-Texte per 2019-12-31.
+
+```{r 02, include = TRUE, results = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
+
+## Abfrage der Wikipedia-Texte im Loop
+df_txt_draft01$txt_wiki <- as.character(NA)
+
+for (i in 1:nrow(df_txt_draft01))  try( {
+  
+df_txt_draft01$txt_wiki[i] <- read_html(df_txt_draft01[i, "wiki_old_url"]) %>% 
+                                  html_nodes(., ".mw-parser-output > p") %>% 
+                                  html_text(.) %>% 
+                                  paste(., collapse = '')
+  
+} )
+
+## Hilfsvariablen löschen
+rm(i)
+
+```
+
+&nbsp;
+
+***
+
+&nbsp;
+
+
+#### 3. Textanalyse (Wörterbücher erstellen & eigentliche Textanalyse)
+
+
+```{r 03, include = TRUE, results = TRUE, eval = TRUE, message = FALSE, warning = FALSE}
+
+## Erstellen Wörterbuch "Lebensbereiche"
+# Definition der Schlüsselworte pro Lebensbereich
+keywrd_privates <- c("wohn*", "leb*", "geboren",  "heimat*", "wuchs", "aufgewachsen", "*bürger*", "stamm*", "kind*", "sohn*", "söhn*", "tochter", "töchter", "*vater", "*väter", "*mutter", "*mütter", "*eltern", "onkel", "tante", "cousin*", "enkel*", "ehe*", "*partner*", "*sprachig", "*familie", "verheiratet", "geschwister", "schwester", "bruder", "brüder", "liiert", "schwager*", "beziehung", "hobby*", "freizeit", "verein*", "spieler*", "imigr*", "emigr*", "auslandsaufenthalt*", "*sprachig", "militär*", "soldat*", "armee", "*leutnant", "hauptmann")
+
+keywrd_ausbildung <- c("ausbild*", "schul*", "primar*", "kantonsschul*", "gymnas*",  "*matur*", "*lehre", "absolv*", "gelernt*", "passerelle*", "studi*", "bachelor*", "master*", "lizenziat", "lizentiat*", "diplom*", "fachhochschule", "universität", "promov*", "doktor*", "dissert*", "weiterbild*", "anwaltspatent", "anwaltsprüfung")
+
+keywrd_beruf <- c("arbeit*", "*beruf*", "anstellung", "angestellt", "mitarbeiter*", "beschäft*", "pensum", "tätig*", "büro", "*manage*", "*führ*", "*leit*", "geschäft", "kader*", "prakti*", "*lehrer*", "beriet", "berater*", "*sekretär*", "assist*", "*dozent*", "*professor*", "forsch*", "*expert*", "unternehme*", "*gründe*", "*inhaber*", "firm*", "*betrieb", "*agentur")
+
+keywrd_politik <- c("gp", "gps", "*politi*", "*partei*", "amt*", "mandat*", "schwerpunkt*", "sp", "grüne", "glp", "cvp", "fdp", "svp", "bdp", "evp", "edu", "lega", "mcg", "juso", " *freisinnig*", "grünliberal*", "sozialdemokratisch*", "christdemokratisch*", "vorstandsmitglied der fdp", "vorstandsmitglied der grünen", "vorstandsmitglied der glp", "vorstandsmitglied der sp", "vorstandsmitglied der cvp", "vorstandsmitglied der svp", "parteivorstand*", "fraktionsvorstand*", "*parlament*", "conseil", "municipio*", "*kommission*", "fraktion*", "legislative", "exekutive", "nationalrat*", "ständerat*", "gemeinderat*", "generalrat*", "stadtrat*", "einwohnerrat*", "grossrat*", "grossen rat*", "landrat*", "kantonsrat*", "regierungsrat*", "staatrat*", "bundesrat", "nationalrät*", "ständerät*", "gemeinderät*", "generalrät*", "stadträt*", "einwohnerrät*", "grossrät*",  "landrät*", "kantonsrät*", "regierungsrät*", "staaträt*", "bundesrät", "*ammann*", "*wahl*", "*wähl*", "*kandi*", "*liste", "vereid*", "antreten*", "sitz*", "nachrücken", "nachgerückt", "*stimme*", "vorstoss*", "vorstöss*", "anfrage*", "motion*", "postulat*", "initiative*", "referendum", "schulrat*", "schulinspektion*", "*aktivist*", "minister*", "*departement*", "*direktion*")
+
+keywrd_engagement <- c("ehrenamtlich*", "stiftung*", "stiftungsrat*", "fondazione*", "verwaltungsrat*", "aufsichtsrat*", "*beirat*", "*beirät*", "vorstand*", "*verein*", "*club*", "*verband*")
+
+# Zusammenfassen der Schlüsselworte zum Wörterbuch für die 5 Lebensbereiche
+dict_lebr <- dictionary(list(ausb = keywrd_ausbildung, beruf = keywrd_beruf, enga = keywrd_engagement, poli = keywrd_politik, priv = keywrd_privates))
+
+
+## Erstellen Wörterbuch "Politikfelder"
+# Definition der Schlüsselworte pro Politikfeld
+keywrd_agric <- c("tiere", "bauern", "landwirtschaft", "wolf", "jagd", "tier", "milch", "kuhe", "wald", "direktzahlungen", "tieren", "jager", "hof", "wolfe", "pferde", "tierschutz", "hunde", "landwirte", "veterinaramt", "agrarpolitik", "agroscope", "bauernverband", "hefenhofen", "fleisch", "biber", "tierschutzer", "hirsche", "horner", "schafe", "wildtiere", "luchs", "hund", "kesselring", "stall", "abschuss", "fischerei", "ziegen", "kuhen", "baume", "futter", "erlegt", "landwirtschaftlichen", "wildschweine", "kalber", "fische", "hundehalter", "tanikon", "kuh", "sonderjagd", "ernte", "milchbauern", "tierqualerei", "rehe", "nutztiere", "alp", "milchpreis", "hochjagd", "waldbesitzer", "hunden", "blw", "ernahrungssicherheit", "kase", "tierhalter", "landwirtschaftliche", "schweine", "katzen", "lebensmittel", "trockenheit", "rinder", "tierschutzgesetz", "kirschen", "jagdgesetz", "rudel", "brosi", "tierwohl", "wolfen", "wild", "trauben", "milchproduzenten", "baren", "bio", "hektaren", "tierhaltung", "carna", "sbv", "holz", "abschusse", "blv", "waldes", "pestizide", "tierschutzes", "jagdgesetzes", "sts")
+
+keywrd_ecofntx <- c("banken", "snb", "kunden", "ubs", "nationalbank", "post", "cs", "finma", "raiffeisen", "dollar", "tourismus", "mrd", "migros", "euro", "geldpolitik", "negativzinsen", "kantonalbank", "postfinance", "fr", "novartis", "swisscom", "umsatz", "aktien", "milliarden", "weko", "zinsen", "aktionare", "coop", "finanzkrise", "firmen", "grossbanken", "anleger", "grossbank", "poststellen", "frankens", "konzern", "gaste", "filialen", "branche", "preise", "baselworld", "investoren", "ezb", "quartal", "produkte", "notenbanken", "uhren", "roche", "hotels", "zentralbank", "sika", "markt", "borse", "group", "wachstum", "bergbahnen", "nestle", "handler", "ausland", "notenbank", "exporte", "gold", "logiernachte", "geschaft", "swatch", "syngenta", "detailhandel", "sunrise", "finanzmarktaufsicht", "banking", "zkb", "franken", "markte", "gewinn", "prozent", "inflation", "marke", "aktie", "laden", "ubernachtungen", "kunde", "poststelle", "unternehmen", "Credit Suisse", "usr", "steuern", "finanzausgleich", "unternehmenssteuerreform", "millionen", "franken", "nfa", "steuerreform", "steuervorlage", "budget", "gewinnsteuer", "steuerprivilegien", "geberkantone", "steuerausfalle", "steuereinnahmen", "steuersenkungen", "besteuert", "gewinnsteuern", "bundessteuer", "besteuerung", "steuersenkung", "steuerwettbewerb", "dividendenbesteuerung", "patentbox", "steuerfuss", "erbschaftssteuer", "steuerbelastung", "steuerverwaltung", "uberschuss", "schuldenbremse", "firmen", "einkommen", "finanzplan", "unternehmenssteuern", "zinsbereinigte", "statusgesellschaften", "einnahmen", "steuererhohung", "defizit", "mio", "ausgaben", "steuersatz", "mehreinnahmen", "nehmerkantone", "dividenden", "steuerlich", "ressourcenausgleich", "finanzausgleichs", "pauschalsteuer", "pauschalbesteuerung", "steuerpflichtigen", "gewinnsteuersatz", "senkung", "ausfalle", "milliarden", "sparpaket", "eigenkapital", "abzug", "gegenfinanzierung", "steuersatze", "mindereinnahmen", "budgetiert", "fiskus", "tax", "firmensteuern", "steuererhohungen", "flat", "voranschlag", "besteuern", "vermogenssteuer", "steuerausfallen", "steuererklarung", "steuerpflichtige", "pauschalbesteuerten", "prozent", "erhohung", "eigenmietwert", "abzuge", "sparmassnahmen", "verrechnungssteuer", "geber", "steuer", "selbstanzeigen", "senken", "gewinnsteuersatze", "kapitalgewinnsteuer", "steuerliche")
+
+keywrd_educ <- c("schuler", "lehrplan", "schulen", "lehrpersonen", "schulerinnen", "unterricht", "volksschulen", "klasse", "schuljahr", "bildung", "studierenden", "lehrplans", "schulern", "lehrmittel", "berufsbildung", "lehrerinnen", "hochschulen", "klassen", "jugendlichen", "padagogischen", "sekundarstufe", "universitaten", "kindergarten", "lernen", "facher", "sekundarschulen", "studierende", "lehrkrafte", "schulleitung", "unterrichten", "fremdsprache", "lektionen", "gymnasien", "studenten", "jugendliche", "mathematik", "franzosisch", "fach", "sek", "fachhochschulen", "edk", "primarstufe", "fachhochschulen", "lehrern", "lehren")
+
+keywrd_cult <- c("kirche", "museum", "museen", "kunst", "kultur", "kunstmuseum", "bistum", "papst", "theater", "islam", "kirchen", "fahrenden", "muslime", "fahrende", "franziskus", "kunstler", "sammlung", "synode", "film", "religion", "katholischen", "kirchgemeinden", "ausstellung", "landeskirche", "reformierten", "werke", "museums", "katholische", "katholiken", "bistums", "festival")
+
+keywrd_ecovrkhr <- c("strom", "akw", "energie", "axpo", "energiestrategie 2050", "wasserkraft", "bkw", "energien", "ensi", "alpiq", "wasser", "beznau", "erneuerbaren", "muhleberg", "kraftwerke", "abfalle", "energiewende", "erneuerbare", "stromproduktion", "nagra", "co2", "umwelt", "klimawandel", "wasserzinsen", "kilowattstunde", "bauzonen", "leibstadt", "energiegesetz", "swissgrid", "richtplan", "wasserkraftwerke", "atomkraftwerke", "kev", "kraftwerk", "kwh", "anlagen", "strompreise", "bfe", "abfall", "repower", "kernenergie", "strommarkt", "windenergie", "emissionen", "tiefenlager", "erneuerbarer", "kernkraftwerke", "grad", "iwb", "stromkonzerne", "solarstrom", "atomausstieg", "klimaschutz", "fukushima", "deponie", "anlage", "bafu", "gletscher", "akw-betreiber", "versorgungssicherheit", "entsorgung", "gas", "einspeisevergutung", "windpark", "wasserzins", "gewasser", "kohle", "netz", "hochwasser", "wind", "stromversorgung", "bauland", "fossilen", "gosgen", "solaranlagen", "bondo", "co2-ausstoss", "atomkraft", "windrader", "atomstrom", "co2-abgabe", "klima", "ebl", "verdichtung", "energieeffizienz", "kva", "stilllegung", "stromnetz", "verbrauch", "atomkraftwerk", "stroms", "ebm", "energiepolitik", "co2-emissionen",  "sbb", "verkehr", "flughafen", "bahn", "passagiere", "tunnel", "bls", "strassen", "bav", "strecke", "bahnhof", "fahren", "astra", "zuge", "rohre", "bus", "strasse", "tram", "gotthard", "ov", "bvb", "velofahrer", "s-bahn", "mieter", "fahrzeuge", "schiene", "fernverkehr", "autofahrer", "ausbau", "autos", "verkehrs", "bau", "bombardier", "bazl", "velo", "blt", "swiss", "auto", "fahrt", "cargo", "airline", "guterverkehr", "umfahrung", "strecken", "flughafens", "autobahn", "velos", "airlines", "fahrplanwechsel", "verspatungen", "parkplatze", "verkehren", "tunnels", "unfalle", "ausbauschritt", "kilometer", "fussganger", "zvv", "ga", "postauto", "haltestelle", "fahrgaste", "lastwagen", "pendler", "stau", "nationalstrassen", "naf", "lufthansa", "fabi", "trams", "regionalverkehr", "linien", "rollmaterial", "zivilluftfahrt", "bundesbahnen")
+
+keywrd_euint <- c("eu", "rahmenabkommen", "bilateralen", "personenfreizugigkeit", "abkommen", "verhandlungen", "eu-kommission", "rahmenvertrag", "flankierenden", "eugh", "lohnschutz", "europaischen", "brexit", "vertrage", "eu-recht", "institutionellen", "binnenmarkt", "schiedsgericht", "union", "bilaterale", "ewr", "schutzklausel", "kohasionsmilliarde", "rahmenabkommens", "eu-staaten", "europapolitik", "unionsburgerrichtlinie", "watteville", "eu-kommissionsprasident", "eu-beitritt", "institutionelles", "europa", "zuwanderung", "borsenaquivalenz", "europaische", "freizugigkeit", "chefunterhandler", "abkommens", "mitgliedstaaten", "institutionelle", "masseneinwanderungsinitiative", "horizon", "osze", "eu-binnenmarkt", "gewerkschaften", "streitbeilegung", "gerichtshof", "verhandeln", "handelshemmnisse", "rechtsubernahme", "marktzugangsabkommen", "kohasionsbeitrag", "verhandlungsmandat", "flam", "insta", "beihilfen", "freizugigkeitsabkommen", "losung", "nachverhandlungen", "marktzugang", "europapolitischen", "fza", "efta-gerichtshof", "mitgliedsstaaten", "inlandervorrang", "diplomaten", "guillotine-klausel", "eda", "deza", "entwicklungshilfe", "nato", "unrwa", "uno", "pakt", "staaten", "neutralitat", "diplomaten", "aussendepartement", "sanktionen", "diplomatie", "beziehungen")
+
+keywrd_gndis <- c("frauen", "manner", "lohngleichheit", "gleichstellung", "frauenstreik", "mannern", "frauenanteil", "frauenquote", "lohndiskriminierung", "geschaftsleitungen", "feminismus", "geschlechter", "sexismus", "lohnunterschied", "gleichberechtigung", "weibliche", "geschlecht", "#metoo", "lohnanalysen", "lohnungleichheit", "gleichstellungsgesetz", "lohndifferenz", "frauenstreiks", "mannlichen", "diskriminierung", "lohnunterschiede", "lohnanalyse", "streik", "weiblichen", "verwaltungsraten", "belastigung", "gender", "frauenstreiktag", "weiblich", "frauenbewegung", "feministinnen", "frauentag", "geschlechtern", "fuhrungspositionen", "gleichstellungskommission", "mannliche", "frauenstimmrecht", "streiken", "quoten", "frauenquoten", "rollenbilder", "gleichstellungsgesetzes", "mannlich", "gewalt", "verwaltungsratinnen", "frauenorganisationen", "cesco", "feministische", "feministin", "frauenzentrale", "unerklarte", "frauenanteils", "frauenforderung", "gleichstellungsburos", "lohn", "sexuelle", "gosteli", "fbb", "gender-studies", "lohndifferenzen", "lohngleichheitsdialog", "quote", "logib", "bpw", "stereotypen", "weiblicher", "politikerinnen", "lohnklagen", "fuhrungsgremien", "erl", "equal", "feministischen", "teilzeitarbeit", "vereinbarkeit", "lohnmobil", "belastigungen", "chefetagen", "diversity", "lohnpolizei")
+
+keywrd_iasyl <- c("fluchtlinge", "sem", "asylsuchenden", "asylsuchende", "asylbewerber", "migration", "eritrea", "fluchtlingen", "migranten", "vorlaufig", "zuwanderung", "asyl", "eritreer", "integration", "auslander", "asylgesuche", "aufgenommene", "asylverfahren", "einburgerung", "personenfreizugigkeit", "asylzentrum", "aufgenommenen", "asylgesuch", "fluchtling", "inlandervorrang", "kontingente", "bundesasylzentrum", "unterkunft", "asylunterkunft", "unterbringung", "durchsetzungsinitiative", "asylbewerbern", "ausschaffung", "migrationsamt", "uma", "asylwesen", "aufenthaltsbewilligung", "sans-papiers", "hochstzahlen", "fluchtlingshilfe", "ors", "untergebracht", "asylbereich", "aufnahme", "einwanderung", "landesverweisung", "unterkunfte", "mittelmeer", "bundeszentren", "abgewiesene", "eritreern", "masseneinwanderungsinitiative", "asylzentren", "ausgeschafft", "asylpolitik", "einburgerungen", "asylgesuchen", "wegweisung", "minderjahrigen", "eritreischen", "bundeszentrum", "minderjahrige", "unbegleitete", "gesuche", "pass", "hartefallklausel", "familiennachzug", "bleiberecht", "asylanten", "bfm", "aoz", "schutzklausel", "kontingenten", "unterkunften", "einburgern", "rasa-initiative", "ausschaffungsinitiative", "asylgesetz", "auslandern", "asylentscheid", "verfahrenszentrum")
+
+keywrd_milit <- c("gripen", "luftwaffe", "vbs", "ndb", "kampfjets", "a-18", "nachrichtendienst", "soldaten", "armeechef", "saab", "armasuisse", "verteidigungsdepartement", "bodluv", "wea", "luftverteidigung", "jets", "militarischen", "kampfflugzeuge", "rekruten", "kampfjet", "sicherheitspolitischen", "militarische", "tiger", "armeereform", "eurofighter", "nachrichtendienstes", "rustungsprogramm", "militarjustiz", "zivis", "f-35", "rs", "gpdel", "geheimdienst", "militardienst", "armeeangehorigen", "rafale", "rekrutenschule", "ruag", "diensttage", "piloten", "grenzwachtkorps","f-5", "zivilen", "korpskommandant", "luftpolizeidienst", "nachrichtendienstgesetz", "armeebudget", "offiziere", "zivilschutz", "mowag", "sicherheitspolitische")
+
+keywrd_arbmk <- c("unternehmen","Mitarbeiter", "arbeitslosenquote", "rav", "zak", "mindestlohn", "arbeitsmarkt", "arbeitnehmer", "arbeitslosigkeit", "arbeitgeber", "arbeitslosen", "gav", "seco", "lohne", "arbeitslose", "gewerkschaften", "unia", "stellensuchenden", "branchen", "arbeitslos", "amkb", "grenzganger", "mindestlohne", "arbeitsvermittlungszentren", "lohn", "lohndumping", "arbeit", "awa", "kurzarbeit", "stellensuchende", "altere", "arbeitszeit", "arbeitszeiterfassung", "arbeitnehmenden", "arbeitgebern", "ams", "arbeitszeiten", "sozialpartner", "gesamtarbeitsvertrag", "beschaftigten", "gewerkschaft", "schwarzarbeit", "arbeitskrafte", "erwerbslosenquote", "kiga", "stellenmeldepflicht", "alteren", "lohnerhohungen", "mindestlohninitiative", "gastgewerbe", "angestellten", "ausgesteuert", "prozent", "mindestlohnen", "baugewerbe", "arbeitnehmende", "firmen", "jobs", "gesamtarbeitsvertrage", "arbeitnehmern", "suva", "arbeiten", "fachkrafte", "arbeitslosenversicherung", "arbeitsmarktkontrolle", "monatslohne", "fachkraftemangel", "zpk", "stellensuche", "stellen", "flankierenden", "arbeitsbedingungen", "arbeitslosenzahlen", "tpk", "personen", "gewerkschaftsbund", "mindestlohns", "langzeitarbeitslosen", "arbeitgeberverband", "mindestlohn-initiative", "syna", "arbeitsgesetz", "beschaftigung", "arbeitslosenkasse", "arbeitsgesetzes", "erwerbstatigen", "gesamtarbeitsvertragen", "arbeiter", "kontrollen", "sozialpartnerschaft", "sozialpartnern")
+
+keywrd_reord <- c("polizei", "polizisten", "tater", "kantonspolizei", "staatsanwaltschaft", "bundesanwaltschaft", "verwahrung", "gericht", "justiz", "gefangnis", "gewalt", "opfer", "straftaten", "beschuldigten", "freiheitsstrafe", "obergericht", "waffen", "rupperswil", "bundesstrafgericht", "ermittlungen", "stadtpolizei", "strafe", "fifa", "justizvollzug", "verurteilt", "haftlinge", "verfahren", "bundesgericht", "beschuldigte", "strafverfahren", "staatsanwalte", "strafvollzug", "fall", "straftater", "untersuchungshaft", "fedpol", "waffe", "delikte", "is", "haft", "strafprozessordnung", "ba", "verteidiger", "anklage", "urteil", "insassen", "bezirksgericht", "gerichte", "zelle", "waffenrecht", "morder", "falle", "verurteilte", "polizeikorps", "verbrechen", "lebenslangliche", "kapo", "korps", "ausschreitungen", "verhaftet", "strafrecht", "bodycams", "polizistinnen", "taters", "behorden", "angeklagten", "poschwies", "gefangenen", "demonstration", "strafen", "kriminalitat", "freiheitsstrafen", "chaoten", "fans", "schusswaffen")
+
+keywrd_phlth <- c("patienten", "arzte", "spitaler", "spital", "bag", "krankenkassen", "pramien", "spitalern", "gesundheit", "behandlungen", "kantonsspital", "cannabis", "medikamente", "ksbl", "ambulanten", "patient", "arzten", "gesundheitswesen", "santesuisse", "grundversicherung", "krankenkasse", "klinik", "spitex", "medizinischen", "ambulant", "hausarzte", "gesundheitskosten", "medizinische", "stationaren", "behandlung", "krankenversicherer", "medizin", "fmh", "ambulante", "leistungen", "pramienverbilligung", "versicherten", "franchise", "unispital", "kassen", "spitals", "einheitskasse", "stationar", "versicherer", "medikament", "bruderholz", "kliniken", "pramienzahler", "krankenkassenpramien", "universitatsspital", "krankenversicherung", "spitalgruppe", "tarmed", "krankheiten", "apotheken", "e-zigaretten", "helsana", "patientinnen", "exit", "impfen", "medikamenten", "rauchen", "impfung", "operationen", "swissmedic", "krankheit", "arzteschaft", "sterbehilfe", "pramienverbilligungen", "spitalfusion", "kantonsspitals", "leistungserbringer", "preisig", "usb", "pflege", "gesundheitsdirektoren", "versorgung", "hirslanden", "css", "stationare", "eingriffe", "curafutura", "zigaretten", "gesundheitsversorgung", "arztinnen", "masern", "mediziner", "spitalliste", "gesundheitsdirektion", "inselspital", "palliative")
+
+keywrd_medkom <- c("srg", "radio", "srf", "billag", "ringier", "tamedia", "fernsehen", "sender", "journalismus", "no-billag-initiative", "sendungen", "offentlichen", "medien", "swisscom", "bakom")
+
+keywrd_natzu <- c("moutier", "fusion", "expo", "landesausstellung", "hymne", "marignano", "sgg", "kantonswechsel", "eidgenossen", "rumantscha", "moutiers", "nationalhymne", "gemeindefusionen", "fusionen", "bundesfeier", "winistoerfer", "rutli", "romanischen", "landeshymne", "kantonszugehorigkeit", "separatisten", "belprahon", "morgarten", "fusionsvertrag", "maissen", "schweizerpsalm", "sprache", "romanische", "rumantsch", "fusionsinitiative", "fusionsgegner", "eidgenossenschaft", "foderalismus", "kantonsfusion", "berntreuen", "ratoromanische", "doppeladler", "jurassische", "franzosisch", "fusions-initiative", "schlacht", "mythen", "sorvilier", "melodie", "wiedervereinigung", "weltausstellung", "fusionsbefurworter", "landessprache", "dialekt", "clavaleyres", "gemeinderate", "ratoromanischen", "grischun", "jura-frage", "landesstreik", "guisan", "neutralitat", "pavillon", "1291", "zusammenschluss", "fremdsprache", "fusionieren", "zukunftsraum", "feuerwerk", "fusionsprojekt", "jura-konflikt", "ratoromanen", "romanisch", "rumantschia", "zuchwil", "abstimmungstourismus", "romands", "nationalfeiertag", "fusionierten", "habsburger", "august-feier", "festansprache", "tell", "tagsatzung")
+
+keywrd_swelf <- c("ahv", "sozialhilfe", "saule", "kesb", "renten", "rente", "pensionskassen", "rentenalter", "altersvorsorge", "vorsorge", "reform", "iv", "pensionskasse", "rentenreform", "umwandlungssatz", "erganzungsleistungen", "rentner", "paare", "vaterschaftsurlaub", "erhohung", "sozialhilfebezuger", "sozialversicherungen", "rentenalters", "lebenserwartung", "umwandlungssatzes", "el", "skos", "grundbedarf", "grundeinkommen", "pid", "geburt", "versicherten", "ahv-renten", "kinderbetreuung", "bsv", "vorsorgeeinrichtungen", "neurentner", "ehepaare", "observationen", "beruflichen", "einkommen", "mehrwertsteuer", "frauenrentenalters", "iv-stelle", "frauenrentenalter", "paaren", "heiratsstrafe", "invalidenversicherung", "ahv-rente", "embryonen", "sozialhilfequote", "abtreibungen", "bezuger", "bvk", "iv-rente", "adoption", "heime", "skos-richtlinien", "rentnern", "ahv-fonds", "umverteilung", "ahv-zuschlag", "deckungsgrad", "schwangerschaft", "elternteil", "betreuung", "behinderung", "rentenniveau", "abtreibung", "bvg", "koordinationsabzug", "pensionierung", "altersreform", "detektive", "leihmutterschaft", "sozialhilfekosten", "erwerbstatigen", "ahv-reform")
+
+# Zusammenfassen der Schlüsselworte zum Wörterbuch für die 15 Politikfelder
+dict_polb <- dictionary(list(agric = keywrd_agric, ecovrkhr = keywrd_ecovrkhr, educ = keywrd_educ, cult = keywrd_cult, ecofntx = keywrd_ecofntx, euint = keywrd_euint, gndis = keywrd_gndis, iasyl = keywrd_iasyl, milit = keywrd_milit, arbmk = keywrd_arbmk, reord = keywrd_reord, phlth = keywrd_phlth, medkom = keywrd_medkom, natzu = keywrd_natzu, swelf = keywrd_swelf))
+
+
+## Löschen der Hilfsvariablen
+rm(list=ls(pattern="^keywrd_"))
+
+```
+
+
+&nbsp;
+
+***
+
+&nbsp;
+
+#### 4. Textanalyse (Abgleich der Wörterbücher)
+
+```{r 04, include = TRUE, results = TRUE, eval = TRUE, message = FALSE, warning = FALSE}
+
+## Corpus und DFM erstellen
+# Corpus Erstellen
+corp01 <- df_txt_draft01 %>% 
+          corpus(., text_field = "txt_wiki")
+
+# dfm erstellen (ohne Symbole, Puktuation und "stopwords")
+dfm01 <- corp01 %>% 
+         tokens(., what = c("word"), remove_symbols = TRUE,
+                                     remove_punct = TRUE) %>% 
+         tokens_remove(., stopwords("german")) %>% 
+         dfm(.)
+
+
+## Wörterbuch-Abfrage
+# Lebensbereich-Abfrage
+res_lebr <- dfm01 %>%
+  dfm_lookup(., dictionary = dict_lebr) %>% 
+  convert(., to = "data.frame")
+res_lebr$wiki_id <- df_txt_draft01$wiki_id
+
+# Politikbereich-Abfrage
+res_polb <- dfm01 %>%
+  dfm_lookup(., dictionary = dict_polb) %>% 
+  convert(., to = "data.frame")
+res_polb$wiki_id <- df_txt_draft01$wiki_id
+
+## merge der beiden Abfragen
+res01 <- merge(x = res_lebr, y = res_polb, by = "wiki_id", all = TRUE)
+res01$document.x <- NULL
+res01$document.y <- NULL
+
+
+## Prozente berechnen
+# Prozente Lebensbereiche berechnen
+res01$sum_lebr <- res01$ausb + res01$beruf + res01$enga + res01$poli + res01$priv
+
+res01$ausb_rel_prc_wiki <- (100 * (res01$ausb / res01$sum_lebr )) %>% 
+                                        round(., digits = 2)
+res01$beruf_rel_prc_wiki <- (100 * (res01$beruf / res01$sum_lebr  )) %>% 
+                                         round(., digits = 2)
+res01$enga_rel_prc_wiki <- (100 * (res01$enga / res01$sum_lebr  )) %>% 
+                                        round(., digits = 2)
+res01$poli_rel_prc_wiki <- (100 * (res01$poli / res01$sum_lebr  )) %>% 
+                                        round(., digits = 2)
+res01$priv_rel_prc_wiki <- (100 * (res01$priv / res01$sum_lebr  )) %>% 
+                                        round(., digits = 2)
+# Prozenstumme Lebensbereiche berechnen
+res01$sum_lebr_prc_wiki <- (res01$ausb_rel_prc_wiki + res01$beruf_rel_prc_wiki +
+                                        res01$enga_rel_prc_wiki + res01$poli_rel_prc_wiki +
+                                        res01$priv_rel_prc_wiki) %>% 
+                                        round(., digits = 1)
+
+
+## Politikbereiche
+res01$sum_polb_wiki <- res01$agric + res01$ecovrkhr + res01$educ + res01$cult + res01$ecofntx + res01$euint + res01$gndis + res01$iasyl + res01$milit + res01$arbmk +                        res01$reord +  res01$phlth + res01$medkom + res01$natzu + res01$swelf
+
+# Prozente Politikbereiche berechnen
+res01$agric_rel_prc_wiki <- (100 * (res01$agric / res01$sum_polb )) %>% 
+                                        round(., digits = 2)
+res01$ecovrkhr_rel_prc_wiki <- (100 * (res01$ecovrkhr / res01$sum_polb )) %>% 
+                                        round(., digits = 2)
+res01$educ_rel_prc_wiki <- (100 * (res01$educ / res01$sum_polb )) %>% 
+                                        round(., digits = 2)
+res01$cult_rel_prc_wiki <- (100 * (res01$cult / res01$sum_polb )) %>% 
+                                        round(., digits = 2)
+res01$ecofntx_rel_prc_wiki <- (100 * (res01$ecofntx / res01$sum_polb )) %>% 
+                                        round(., digits = 2)
+res01$euint_rel_prc_wiki <- (100 * (res01$euint / res01$sum_polb )) %>% 
+                                        round(., digits = 2)
+res01$gndis_rel_prc_wiki <- (100 * (res01$gndis / res01$sum_polb )) %>% 
+                                        round(., digits = 2)
+res01$iasyl_rel_prc_wiki <- (100 * (res01$iasyl / res01$sum_polb )) %>% 
+                                        round(., digits = 2)
+res01$milit_rel_prc_wiki <- (100 * (res01$milit / res01$sum_polb )) %>% 
+                                        round(., digits = 2)
+res01$arbmk_rel_prc_wiki <- (100 * (res01$arbmk / res01$sum_polb )) %>% 
+                                        round(., digits = 2)
+res01$reord_rel_prc_wiki <- (100 * (res01$reord / res01$sum_polb )) %>% 
+                                        round(., digits = 2)
+res01$phlth_rel_prc_wiki <- (100 * (res01$phlth / res01$sum_polb )) %>% 
+                                        round(., digits = 2)
+res01$medkom_rel_prc_wiki <- (100 * (res01$medkom / res01$sum_polb )) %>% 
+                                        round(., digits = 2)
+res01$natzu_rel_prc_wiki <- (100 * (res01$natzu / res01$sum_polb )) %>% 
+                                        round(., digits = 2)
+res01$swelf_rel_prc_wiki <- (100 * (res01$swelf / res01$sum_polb )) %>% 
+                                        round(., digits = 2)
+# Prozentsumme Politikbereiche berechnen
+res01$sum_polb_prc_wiki <- (res01$agric_rel_prc_wiki + res01$ecovrkhr_rel_prc_wiki + res01$educ_rel_prc_wiki + res01$cult_rel_prc_wiki + res01$ecofntx_rel_prc_wiki + res01$euint_rel_prc_wiki + res01$gndis_rel_prc_wiki + res01$iasyl_rel_prc_wiki + res01$milit_rel_prc_wiki + res01$arbmk_rel_prc_wiki + res01$reord_rel_prc_wiki +
+  res01$phlth_rel_prc_wiki + res01$medkom_rel_prc_wiki + res01$natzu_rel_prc_wiki + res01$swelf_rel_prc_wiki) %>% round(., digits = 1)
+
+
+## Vereinigung resultate mit df_txt_... 
+df_txt_draft01 <- merge(df_txt_draft01, res01, by = "wiki_id", all.x = TRUE)
+
+## Löschen der Hilfsvariablen
+rm(corp01, dfm01, dict_lebr, dict_polb, res_lebr, res_polb, res01)
+
+``` 
+
+
+&nbsp;
+
+***
+
+&nbsp;
+
+#### 6. Zählen der Wörter
+
+```{r 06, include = TRUE, results = TRUE, eval = TRUE, message = FALSE, warning = FALSE}
+
+## Abfrage der Wortlänge 
+for (i in 1:nrow(df_txt_draft01)) {
+df_txt_draft01$wrd_no_wiki[i] <-  df_txt_draft01$txt_wiki[i] %>% 
+                                  tokens(., what = c("word"),
+                                  remove_symbols = TRUE,
+                                  remove_punct = TRUE) %>% 
+                                  unlist(.) %>% 
+                                  length(.)
+}
+
+
+```
+
+
+&nbsp;
+
+***
+
+&nbsp;
+
+#### 5. Speichern des Datensatzes zur Inhalts- bzw. Textanalyse  `df_txt_draft01.rds`
+
+```{r 05, include = TRUE, results = TRUE, eval = TRUE, message = FALSE, warning = FALSE}
+
+
+## Speichern & Anzeigen des Basisdatensatzes
+saveRDS(df_txt_draft01, file = ("./Rohdaten/df_txt_draft01.rds"))
+
+## Anzeigen des Basisdatensatzes
+df_txt_draft01 %>% 
+    kable(., caption = "Textanalyse-Datensatz, roh",
+          row.names = FALSE) %>%
+    kable_styling(bootstrap_options = c("striped", "responsive"), 
+    full_width = TRUE, position = "center") %>% 
+    scroll_box(., height = "800px")
+
+## Hilfsdaten Löschen        
+rm(df_txt_draft01)
+
+
+
+
+```
+
