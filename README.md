@@ -4,4 +4,4 @@ Hier finden sich alle Dokumente des Capstone-Kurses **"Online-Wahrnehmung von Po
 
 Der Schlussbericht ist unter _CS_Schlussbericht_final.pdf_ zu finden.
 Alle Rohdaten und die dazugehörigen Codes finden sich im Ordner _Replikationsdaten_
-Die DAten wurden mit dem statistischen Programm "R" erstellt, Version 3.6.3.
+Die Daten wurden mit dem statistischen Programm "R" (Version 3.6.3.) berechnet, die Datenquellen sind im Schlussbericht zu finden.
