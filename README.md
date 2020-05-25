@@ -3,7 +3,7 @@
 Dieses _Respository_ enthält den Replikationsdatensatz für die des Capstone-Kurses **"Online-Wahrnehmung von Politikerinnen in der Schweiz"**.
 Im Ordner _Replikationsdatensatz_ finden sich die Codes, die die verwendeten Daten replizieren.
 Die Codes sind in _R_ (Version 3.6.1) geschrieben, mit _RMarkdown_ (Version 1.2.1578) dargestellt und sowohl im _.rdm_ als auch im _.html_-Format augegeben. 
-Die resultierenden datensätze sind im R-Format _.rds_ abgespeichert. Alle benötigten Datensätze finden sich im Unterordner _Rohdaten_. Die Datenquellen sind in den Codes genannt.
+Die resultierenden Datensätze sind im R-Format _.rds_ abgespeichert. Alle benötigten Datensätze finden sich im Unterordner _Rohdaten_. Die Datenquellen sind in den Codes genannt.
 
 &nbsp;
 
