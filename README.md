@@ -23,10 +23,13 @@ Die resultierenden Datensätze sind im R-Format _.rds_ abgespeichert. Alle benö
 + _CS_txt_draft01.rmd_ erzeugt die Inhaltsanalysedaten des Wikipedia-Eintrags, den Datensatz _df_txt_draft01.rds_. In diesem Code werden auch die Wikipediatexte heruntergeladen und verarbeitet.
 + _CS_txt_draft01.rmd_ benötigt den Basisdatensatz _df_base_draft01.rds_, der entsteht, wenn _CS_base_draft01.rmd_ durchgeführt wird.
 
-
 &nbsp;
 
 **Code: CS_alldata_draft01.rmd / CS_alldata_draft01.html**
 + _CS_alldata_draft01.rmd_ führt alle Datensätze zusammen in den Datensatz _df_alldata_draft01.rds_. 
 + _CS_alldata_draft01.rmd_ benötigt alle drei Datensätze (_df_base_draft.rds_, _df_meta_draft01.rds_ und _df_txt_draft01.rds_) die entstehen, wenn _CS_base_draft.rmd_, _CS_meta_draft.rmd_ und _CS_txt_draft01.rmd_, durchgeführt werden.
 
+&nbsp;
+
+**Datensatz: df_all_data_draft07.rds** (im Unterordner _Rohdaten_)
++ _df_all_data_draft07.rds_ ist der Datensatz, mit dem die Auswertungen erstellt wurden.
